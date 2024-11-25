@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Deps: refactor-nrepl:2.5.1">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/refactor-nrepl/refactor-nrepl/2.5.1/refactor-nrepl-2.5.1.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
