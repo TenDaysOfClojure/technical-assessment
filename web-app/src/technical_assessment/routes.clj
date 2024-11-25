@@ -9,7 +9,9 @@
    ;; 3rd party intergation low level tools
    [clj-http.client :as client]
    [cheshire.core :as json]
-   [technical-assessment.integration.cloudinary :as cloudinary]
+   [technical-assessment.integration.cloudinary :as integration.cloudinary]
+   [technical-assessment.integration.facebook-auth :as integration.facebook-auth]
+
 
    ;; General config
    [technical-assessment.config :as config]
@@ -20,25 +22,6 @@
    [technical-assessment.ux.pages.home :as home-page]
    [technical-assessment.ux.pages.general :as general-pages]))
 
-
-(defn fetch-facebook-auth [code]
-  (let [token-resp   (client/post
-                      "https://graph.facebook.com/v10.0/oauth/access_token"
-                      {:form-params {:client_id (:app-id config/facebook-auth-config)
-                                     :redirect_uri (:redirect-uri config/facebook-auth-config)
-                                     :client_secret (:client-secret config/facebook-auth-config)
-                                     :code code}})
-
-        access-token (:access_token (json/parse-string (:body token-resp) true))
-
-        user-resp    (client/get
-                      "https://graph.facebook.com/me"
-                      {:query-params {:access_token access-token
-                                      :fields "id,first_name,last_name,email,picture.width(2048).height(2048)"}})
-
-        user-info     (json/parse-string (:body user-resp) true)]
-
-    (str "User Info: " user-info)))
 
 (defroutes app-routes
 
@@ -67,17 +50,17 @@
              ;; for authentication callbacks. `action-to-take` here can be `sign-up` or `login`.
              action-to-take      state
 
-             user-data           (fetch-facebook-auth code)
+             user-data           (integration.facebook-auth/fetch-facebook-user-details code)
 
              profile-pic-url     (get-in user-data [:picture :data :url])
 
-             {:keys [public-id]} (technical-assessment.integration.cloudinary/upload-image-using-image-url
+             {:keys [public-id]} (integration.cloudinary/upload-image-using-image-url
                                   config/default-cloudinary-config
                                   profile-pic-url)
 
              user-details        {:user-id (str (java.util.UUID/randomUUID))
                                   :profile-pic.integration.cloudinary/public-id public-id
-                                  :profile-pic/url (cloudinary/public-image-url public-id)}
+                                  :profile-pic/url (integration.cloudinary/public-image-url public-id)}
 
              ;; TODO mock saving user to database
              ]
