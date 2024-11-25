@@ -1,6 +1,7 @@
 (ns scratch
   (:require [technical-assessment.http-server :as http-server]
-            [technical-assessment.config :as config]))
+            [technical-assessment.config :as config]
+            [technical-assessment.database.core :as database]))
 
 ;; This file contains common scratch code that is used during development
 
@@ -15,5 +16,6 @@
   (http-server/stop-server! config/default-http-port)
 
   (http-server/stop-all-servers!)
+
 
   )

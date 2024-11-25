@@ -22,3 +22,16 @@
 (defn find-all-entities [db entity-type]
   (let [handler (:find-all-entities db)]
     (handler entity-type)))
+
+
+(defn find-entity [db entity-type query]
+  (->> (find-all-entities db entity-type)
+       (filter (fn [entity]
+                 (every? (fn [[query-key query-value]]
+                           (= (get entity query-key) query-value))
+                         query)))
+       (first)))
+
+
+(defn entity-exists? [db entity-type query]
+  (not (nil? (find-entity db entity-type query))))

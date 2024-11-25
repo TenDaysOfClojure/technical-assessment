@@ -42,52 +42,79 @@
 
 
   (GET urls/auth-facebook-call-back-route {{:keys[code state]} :params :as params}
+
+       ;; TODO This route now contains in situ soluton to the tech assessment
+       ;; the next step would be to refactor this into integration / domain code
+
        (let [;; Note we use Facebook login API `state` param to pass the action to take
              ;; `state` is the name of the parameter facebook uses to allow including extra data
              ;; for authentication callbacks. `action-to-take` here can be `sign-up` or `login`.
-             action-to-take       state
+             action-to-take        state
 
-             facebook-user        (integration.facebook-auth/find-facebook-user
-                                   config/facebook-auth-config
-                                   code)
+             facebook-user         (integration.facebook-auth/find-facebook-user
+                                    config/facebook-auth-config
+                                    code)
 
-             profile-pic-url      (get-in facebook-user [:picture :data :url])
+             profile-pic-url       (get-in facebook-user [:picture :data :url])
 
-             facebook-user-id     (:id facebook-user)
+             facebook-user-id      (:id facebook-user)
 
-             {cloudinary-secure-url :secure-url
-              cloudinary-public-id :public-id
-              cloudinary-version   :version
-              cloudinary-format    :format} (integration.cloudinary/upload-image-using-image-url
-                                             config/default-cloudinary-config
-                                             profile-pic-url)
+             base-user             (if-let [user (database/find-entity
+                                                  (config/current-database)
+                                                  :users
+                                                  {:user.auth.facebook/user-id facebook-user-id})]
+                                     ;; Existing entity in database
+                                     user
+
+                                     ;; New base user entity
+                                     {:entity/id (database/new-entity-id)
+                                      :user.auth.facebook/user-id facebook-user-id})
+
+             {cloudinary-secure-url
+              :secure-url
+
+              cloudinary-public-id
+              :public-id
+
+              cloudinary-version
+              :version
+
+              cloudinary-format
+              :format}              (integration.cloudinary/upload-image-using-image-url
+                                     config/default-cloudinary-config
+                                     profile-pic-url)
 
              {:keys [first-name
                      last-name
-                     email]}      facebook-user
+                     email]}       facebook-user
 
-             user-id              (database/new-entity-id)
+             existing-user         (database/find-entity
+                                    (config/current-database)
+                                    :users
+                                    {:user.auth.facebook/user-id facebook-user-id})
 
-             user-details         {:entity/id user-id
+             user-details          (merge base-user
+                                          ;; This will always update the users details
+                                          ;; from facebook
+                                          {;; Profile details pulled from facebook
+                                           :user/first-name first-name
+                                           :user/last-name last-name
+                                           :user/full-name (str first-name " " last-name)
+                                           :user/email-address email
+                                           :user/profile-pic-url cloudinary-secure-url
 
-                                   ;; Stored for reference
-                                   :user.auth.facebook/user-id facebook-user-id
+                                           ;; cloudinary integration details
+                                           :user.profile-pic.intergration.cloudinary/url cloudinary-secure-url
+                                           :user.profile-pic.intergration.cloudinary/public-id cloudinary-public-id
+                                           :user.profile-pic.intergration.cloudinary/version cloudinary-version
+                                           :user.profile-pic.intergration.cloudinary/format cloudinary-format})
 
-                                   ;; Profile details pulled from facebook
-                                   :user/first-name first-name
-                                   :user/last-name last-name
-                                   :user/full-name (str first-name " " last-name)
-                                   :user/email-address email
-                                   :user/profile-pic-url cloudinary-secure-url
-
-                                   ;; cloudinary integration details
-                                   :user.profile-pic.intergration.cloudinary/url cloudinary-secure-url
-                                   :user.profile-pic.intergration.cloudinary/public-id cloudinary-public-id
-                                   :user.profile-pic.intergration.cloudinary/version cloudinary-version
-                                   :user.profile-pic.intergration.cloudinary/format cloudinary-format}
-
+             ;; Always save the user with the latest details
              saved?             (database/save-entity (config/current-database)
-                                                      :users user-details)]
+                                                      :users
+                                                      user-details)
+
+             user-id            (:entity/id user-details)]
 
          (response/redirect (urls/user-dashboard-route user-id))))
 
@@ -101,7 +128,8 @@
 
 
   ;; General 404 / page not found handler,
-  ;; Note the 500 / unexpected error handler is implemented in middleware.
+  ;; Note the 500 / unexpected error handler is implemented as middleware
+  ;; in `technical-assessment.middleware/wrap-exceptions`.
   (route/not-found (html/render
                     (general-pages/not-found-page))))
 
