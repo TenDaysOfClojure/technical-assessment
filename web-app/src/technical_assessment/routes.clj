@@ -9,6 +9,7 @@
    ;; 3rd party intergation low level tools
    [clj-http.client :as client]
    [cheshire.core :as json]
+   [technical-assessment.integration.cloudinary :as cloudinary]
 
    ;; General config
    [technical-assessment.config :as config]
@@ -62,10 +63,32 @@
 
   (GET urls/auth-facebook-call-back-route {{:keys[code state]} :params}
        (let [;; Note we use Facebook login API `state` param to pass the action to take
-             action-to-take state
-             user-data      (fetch-facebook-auth code)]
+             ;; `state` is the name of the parameter facebook uses to allow including extra data
+             ;; for authentication callbacks. `action-to-take` here can be `sign-up` or `login`.
+             action-to-take      state
 
-         (str action-to-take " user: " user-data)))
+             user-data           (fetch-facebook-auth code)
+
+             profile-pic-url     (get-in user-data [:picture :data :url])
+
+             {:keys [public-id]} (technical-assessment.integration.cloudinary/upload-image-using-image-url
+                                  config/default-cloudinary-config
+                                  profile-pic-url)
+
+             user-details        {:user-id (str (java.util.UUID/randomUUID))
+                                  :profile-pic.integration.cloudinary/public-id public-id
+                                  :profile-pic/url (cloudinary/public-image-url public-id)}
+
+             ;; TODO mock saving user to database
+             ]
+
+         (str action-to-take " user: "
+              user-data
+              "  "
+
+              user-details
+
+              )))
 
 
   ;; General 404 / page not found handler,
