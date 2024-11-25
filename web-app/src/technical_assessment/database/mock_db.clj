@@ -1,9 +1,12 @@
 ;; A very simple EDN based database for rapid prototyping
+
 (ns technical-assessment.database.mock-db
   (:require [clojure.edn :as edn]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [clojure.pprint]))
 
 (def mock-db-resource-sub-directory-name "mock_database")
+
 
 (defn- read-edn [file-path]
   (let [resource-path (io/resource
@@ -27,6 +30,18 @@
    (prn-str data)))
 
 
+(defn pretty-write-edn
+  [file-path data]
+  (spit (str "./resources/" mock-db-resource-sub-directory-name "/" file-path)
+        (with-out-str
+          (clojure.pprint/write
+           data :dispatch clojure.pprint/code-dispatch))))
+
+
+;; Note this returns a map of functions intead of a CLojure protocal https://clojure.org/reference/protocols
+;; Clojure protocals are great but have a high learning curve for juniors
+;; and less experienced clojure developers so this provides a good alternative that uses minimal clojure
+;; lanage feature
 (defn get-db [file-path]
   {:save-entity
    (fn [entity-kind entity]
@@ -35,26 +50,19 @@
            id         (:entity/id entity)
 
            updated-db (assoc-in db [entity-kind id] entity)]
+
        (write-edn file-path updated-db)
 
        ;; For now always return true
        true))
 
-   :update-entity
-   (fn [id updates]
-     (let [db (read-edn file-path)]
-       (if-let [entity (get db id)]
-         (let [updated-entity (merge entity updates)
-               updated-db (assoc db id updated-entity)]
-           (write-edn file-path updated-db)
-           updated-entity)
-         (throw (ex-info "Entity not found" {:id id})))))
 
-   :find-entity
+   :find-entity-by-id
    (fn [entity-kind id]
      (let [db (read-edn file-path)]
        (get-in db [entity-kind id])))
 
+
    :find-all-entities
-   (fn []
-     (vals (read-edn file-path)))})
+   (fn [entity-type]
+     (vals (get (read-edn file-path) entity-type)))})

@@ -5,7 +5,8 @@
             [clojure.string :as string]
             [cheshire.core :as json]
             [clojure.pprint]
-            [technical-assessment.config :as config]))
+            [technical-assessment.config :as config]
+            [camel-snake-kebab.core :as casing]))
 
 
 (def auth-http-headers
@@ -54,60 +55,22 @@
 
         response    (client/post url params)
 
-        result-info (json/decode (:body response))
-
-        public-id   (get result-info "public_id")]
-
-    {:public-id public-id
-     :public-url (public-image-url cloudinary-config public-id)}))
+        result-info (json/decode (:body response)
+                                 casing/->kebab-case-keyword)]
+    result-info))
 
 
 (defn fetch-image [cloudinary-config public-id]
-  (let [url (str "https://res.cloudinary.com/"
-                 (:cloud-name cloudinary-config)
-                 "/image/upload/" public-id)]
-    ;; Note we fetch cloudinary data as a :stream
-    ;; to allow elegant handling of data
-    (client/get (public-image-url cloudinary-config public-id)
-                {:as :stream})))
+  ;; Note we fetch cloudinary data as a :stream
+  ;; to allow elegant handling of data
+  (client/get (public-image-url cloudinary-config public-id)
+              {:as :stream}))
 
 
 (defn fetch-image-and-save-to-local-file
   [cloudinary-config public-id file-path-to-save]
 
-   ;; TODO error handling
   (let [{:keys [body]} (fetch-image cloudinary-config public-id)]
-    ;; This saves the stream to a local file
+    ;; This saves the stream to a local file and is an elegant
+    ;; want of working with file data
     (io/copy body (java.io.File. file-path-to-save))))
-
-
-(def default-cloudinary-config
-  {:cloud-name (System/getenv "CLOUDINARY_CLOUD_NAME")
-   :api-key (System/getenv "CLOUDINARY_API_KEY")
-   :api-secret (System/getenv "CLOUDINARY_API_SECRET")})
-
-
-(comment
-
-  ;; Upload single file from url
-  #_(let [upload-response (upload-image-using-image-url
-                         default-cloudinary-config
-                         "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=122124092180403314&height=2048&width=2048&ext=1735114996&hash=AbbJXR9FEcl9dxDuav-Q6P35")
-
-        _ (clojure.pprint/pprint upload-response)]
-
-    {:public-id "profilepic_pnq4po"}
-    true)
-
-
-  ;; Fetch and save single file
-  (let [public-id        "test-image_px6tzb" #_"cld-sample-4"
-        file-path-to-save "/Users/ghostdog/Desktop/hello-world.jpg"]
-    (fetch-image-and-save-to-local-file default-cloudinary-config
-                                  public-id
-                                  "/Users/ghostdog/Desktop/hello-world.jpg"))
-
-
-
-
-  )

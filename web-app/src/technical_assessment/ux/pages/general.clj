@@ -5,7 +5,7 @@
 
 (defn not-found-page []
   (layouts/main-layout
-   [:div.info-alert
+   [:div.warning-alert
     svg-library/info-icon
     "It looks like the page you're looking for doesn't exist or has been moved."]))
 

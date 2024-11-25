@@ -3,12 +3,11 @@
    ;; HTTP / Web server
    [compojure.core :refer [defroutes GET]]
    [compojure.route :as route]
+   [ring.util.response :as response]
    [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
    [technical-assessment.middleware :refer [wrap-exceptions]]
 
-   ;; 3rd party intergation low level tools
-   [clj-http.client :as client]
-   [cheshire.core :as json]
+   ;; Intergatio
    [technical-assessment.integration.cloudinary :as integration.cloudinary]
    [technical-assessment.integration.facebook-auth :as integration.facebook-auth]
    [technical-assessment.database.core :as database]
@@ -20,7 +19,8 @@
    ;; Sever side rendering, layouts and content etc
    [technical-assessment.render-html :as html]
    [technical-assessment.ux.pages.home :as home-page]
-   [technical-assessment.ux.pages.general :as general-pages]))
+   [technical-assessment.ux.pages.general :as general-pages]
+   [technical-assessment.ux.pages.user :as user-pages]))
 
 
 (defroutes app-routes
@@ -35,52 +35,69 @@
 
   ;; Handles sign-up and login actions via a URL param named :action
   (GET (str urls/auth-facebook-base-route "/:action")  [action]
-       (let [auth-url (str "https://www.facebook.com/v10.0/dialog/oauth?client_id=" (:app-id config/facebook-auth-config)
-                           "&redirect_uri=" (:redirect-uri config/facebook-auth-config) "&scope=email"
-                           ;; Note we use Facebook login API `state` param to pass the action to take
-                           ;; The `response_type` querystring must be `code` for this to work.
-                           "&response_type=code&state=" action)]
-         ;; Redirects the browser to the facebook auth url
-         {:status 302 :headers {"Location" auth-url}}))
+       (let [auth-url (integration.facebook-auth/authenticaiton-redirect-url
+                       config/facebook-auth-config
+                       action)]
+         (response/redirect auth-url)))
 
 
   (GET urls/auth-facebook-call-back-route {{:keys[code state]} :params :as params}
        (let [;; Note we use Facebook login API `state` param to pass the action to take
              ;; `state` is the name of the parameter facebook uses to allow including extra data
              ;; for authentication callbacks. `action-to-take` here can be `sign-up` or `login`.
-             action-to-take      state
+             action-to-take       state
 
-             facebook-user       (integration.facebook-auth/find-facebook-user
-                                  config/facebook-auth-config
-                                  code)
+             facebook-user        (integration.facebook-auth/find-facebook-user
+                                   config/facebook-auth-config
+                                   code)
 
-             profile-pic-url     (get-in facebook-user [:picture :data :url])
+             profile-pic-url      (get-in facebook-user [:picture :data :url])
 
-             facebook-user-id    (:id facebook-user)
+             facebook-user-id     (:id facebook-user)
 
-             {:keys [public-id]} (integration.cloudinary/upload-image-using-image-url
-                                  config/default-cloudinary-config
-                                  profile-pic-url)
+             {cloudinary-secure-url :secure-url
+              cloudinary-public-id :public-id
+              cloudinary-version   :version
+              cloudinary-format    :format} (integration.cloudinary/upload-image-using-image-url
+                                             config/default-cloudinary-config
+                                             profile-pic-url)
 
-             user-details        {:entity/id (str (java.util.UUID/randomUUID))
-                                  :user.auth.facebook/user-id facebook-user-id
+             {:keys [first-name
+                     last-name
+                     email]}      facebook-user
 
-                                  :user/first-name (:first-name facebook-user)
-                                  :user/last-name (:last-name facebook-user)
-                                  :user/email-address (:email facebook-user)
+             user-id              (database/new-entity-id)
 
-                                  :user.profile-pic.integration.cloudinary/public-id public-id
-                                  :user.profile-pic/url (integration.cloudinary/public-image-url
-                                                         config/default-cloudinary-config
-                                                         public-id)}
+             user-details         {:entity/id user-id
+
+                                   ;; Stored for reference
+                                   :user.auth.facebook/user-id facebook-user-id
+
+                                   ;; Profile details pulled from facebook
+                                   :user/first-name first-name
+                                   :user/last-name last-name
+                                   :user/full-name (str first-name " " last-name)
+                                   :user/email-address email
+                                   :user/profile-pic-url cloudinary-secure-url
+
+                                   ;; cloudinary integration details
+                                   :user.profile-pic.intergration.cloudinary/url cloudinary-secure-url
+                                   :user.profile-pic.intergration.cloudinary/public-id cloudinary-public-id
+                                   :user.profile-pic.intergration.cloudinary/version cloudinary-version
+                                   :user.profile-pic.intergration.cloudinary/format cloudinary-format}
 
              saved?             (database/save-entity (config/current-database)
-                                                      :users user-details) ]
+                                                      :users user-details)]
 
-         (clojure.pprint/pprint user-details)
+         (response/redirect (urls/user-dashboard-route user-id))))
 
-         (str saved? "" facebook-user " --" user-details)))
 
+  (GET (urls/user-dashboard-route ":user-id") [user-id]
+       (let [user-details (database/find-entity-by-id
+                           (config/current-database)
+                           :users user-id)]
+
+         (html/render (user-pages/dashboard-page user-details))))
 
 
   ;; General 404 / page not found handler,
