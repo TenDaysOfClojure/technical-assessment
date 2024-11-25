@@ -1,7 +1,9 @@
 (ns technical-assessment.config
   (:require [clojure.string :as string]
             [taoensso.timbre :as logger]
-            [clojure.pprint])
+            [clojure.pprint]
+            [technical-assessment.database.mock-db :as mock-db]
+            [clojure.java.io :as io])
 
   (:import java.util.Base64))
 
@@ -17,7 +19,8 @@
                                     (string/blank? config-value)))
                           (map first))]
       (throw
-       (ex-info (str "Configuration error: " config-type " config is missing config values."
+       (ex-info (str "Configuration error: " config-type
+                     " config is missing config values."
                      " All values are expected to be provided.")
                 {:blank-config-keys blank-keys})))))
 
@@ -101,6 +104,17 @@
 (defn check-cloudinary-config! []
   (check-config-map! "Cloudinary" default-cloudinary-config))
 
+
+(def mock-db (when (development-environment?)
+               (mock-db/get-db "db.edn")))
+
+
+(defn current-database []
+  (if (development-environment?)
+    mock-db
+    ;; Only development is supported in v1
+    (throw
+     (Exception. "Production database not yet implemented." {}))))
 
 (defn setup-config! []
   (enable-minimal-logging!)
