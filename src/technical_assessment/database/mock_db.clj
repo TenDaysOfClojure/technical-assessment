@@ -21,15 +21,6 @@
       {})))
 
 
-(defn- write-edn [file-path data]
-  (spit
-   (str "./resources/"
-        mock-db-resource-sub-directory-name
-        "/" file-path)
-
-   (prn-str data)))
-
-
 (defn pretty-write-edn
   [file-path data]
   (spit (str "./resources/" mock-db-resource-sub-directory-name "/" file-path)
@@ -51,7 +42,7 @@
 
            updated-db (assoc-in db [entity-kind id] entity)]
 
-       (write-edn file-path updated-db)
+       (pretty-write-edn file-path updated-db)
 
        ;; For now always return true
        true))

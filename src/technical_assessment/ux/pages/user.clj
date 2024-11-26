@@ -6,14 +6,10 @@
             [clojure.pprint]))
 
 
-(defn user-fields-table [user]
-  ;; Sorts the fields by the key of the map
-  (let [fields (sort-by key user)]
-    [:table.table-auto
-     (for [[key value] fields]
-       [:tr.border.border-slate-200
-        [:td.p-2.text-gray-700.font-semibold (str key)]
-        [:td.p-2.text-gray-500 value]])]))
+(defn pretty-database-entity [entity]
+  [:pre.text-xs.md:text-sm.font-mono
+   (with-out-str
+     (clojure.pprint/pprint entity))])
 
 
 (defn dashboard-page [user]
@@ -21,30 +17,30 @@
 
    [:div.space-y-5
 
-    [:div.flex.items-center.content-start.space-x-4
+    [:div.text-center.space-y-3.md:flex.md:items-center.md:content-start.md:space-x-4
 
-     [:div
-      [:img.rounded-full.w-28.border
+     [:div.mx-auto.md:m-0
+      [:img.rounded-full.w-28.border.mx-auto
        {:src (domain.user/profile-pic-url user)
         :alt "Profile picture"}]]
 
-     [:div.space-y-2
+     [:div.space-y-2.text-center
       [:h1.text-3xl "👋 Welcome " (domain.user/full-name user) "!"]
 
       (when (domain.user/has-email-address? user)
         (let [email-address (domain.user/email-address user)]
-          [:div.flex.space-x-2
-           [:a.link.flex {:href (str "mailto:" email-address)}
+          [:div.space-x-2.text-center
+           [:a.link {:href (str "mailto:" email-address)}
             svg-library/email-icon  email-address]
 
            [:span " | "]
 
            [:a.link {:href urls/home-route} "Log out now"]]))]]
 
-    [:div.space-y-3
+    [:div.space-y-3.mx-auto.w-96.md:mx-0
      [:h2.text-xl "Congratulations, you're now logged in!"]
      [:p "As part of this technical assessment the following user data was persisted:"]
 
-     [:div (user-fields-table user)]
+     [:div (pretty-database-entity user)]
 
      [:div [:a.link {:href urls/home-route} "Log out now"]]]]))
