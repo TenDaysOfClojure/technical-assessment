@@ -63,6 +63,8 @@ The following environment variables are supported:
 
 - **CLOUDINARY_API_SECRET** - The API secret for Cloudinary
 
+- **HTTP_PORT** - Indicates if port that the HTTP server should run on, defaults to 3000
+
 - **PRODUCTION_ENV** - Indicates if the environment is production
 
 ### Example of Starting a REPL with Environment Variables
