@@ -74,7 +74,9 @@
 
         cloudinary-result (integration.cloudinary/upload-image-using-image-url
                            config/default-cloudinary-config
-                           profile-pic-url)
+                           profile-pic-url
+                           :public-id (:entity/id base-user)
+                           :tags ["user profile picture"])
 
         ;; For now this will always update the users details using facebook user
         ;; details and also upload the latest profile picture to cloudinary

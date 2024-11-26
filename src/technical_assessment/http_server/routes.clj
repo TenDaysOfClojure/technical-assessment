@@ -6,7 +6,8 @@
    [ring.util.response :as response]
    [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
    [technical-assessment.http-server.middleware :as app-middleware]
-   [ring.logger :as logger]
+   [ring.logger :as request-logger]
+   [taoensso.timbre :as logger]
 
    ;; Intergation
    [technical-assessment.integration.facebook-auth :as integration.facebook-auth]
@@ -47,6 +48,8 @@
        ;; The `state` parameter is what facebook authentication uses to allow including extra data
        ;; for authentication callbacks. In this case the `state` will be either `sign-up` or `login`.
 
+       (logger/info "Facebook auth callback received for" state)
+
        (let [user-details (domain.user/login-or-sign-up-user-via-facebook code)
 
              user-id      (:entity/id user-details)]
@@ -74,7 +77,7 @@
 (def app
   (-> app-routes
       (wrap-defaults site-defaults)
-      (logger/wrap-with-logger {:timing false
-                                :logger (app-middleware/->WebRequestLogger)
-                                :redact-keys app-middleware/logger-keys-to-redact})
+      (request-logger/wrap-with-logger {:timing false
+                                        :logger (app-middleware/->WebRequestLogger)
+                                        :redact-keys app-middleware/logger-keys-to-redact})
       (app-middleware/wrap-exceptions)))
