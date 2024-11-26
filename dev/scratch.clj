@@ -11,11 +11,23 @@
   (config/setup-config!)
 
   ;; HTTP server management
+
   (http-server/start-server! :port config/default-http-port)
 
   (http-server/stop-server! config/default-http-port)
 
   (http-server/stop-all-servers!)
 
+
+  ;; Database
+
+  (database/save-entity (config/current-database) :user
+                        {:entity/id "AB" :user/name "Alice" :user/age 30})
+
+  (database/find-entity-by-id (config/current-database) :user "AB")
+
+  (database/find-entity (config/current-database) :user {:user/name "Alice"})
+
+  (database/find-all-entities (config/current-database) :user)
 
   )

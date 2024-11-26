@@ -5,12 +5,10 @@
 
 ;; Main entry point for HTTP server when run using:
 ;;
-;; clj -M -m technical-assessment.core {}
-;;
-;; See README for using different ports
+;; clj -M -m technical-assessment.core
+
 (defn -main [& port]
 
   (config/setup-config!)
 
-  (let [port (or (first port) config/default-http-port)]
-    (http-server/start-server! :port port)))
+  (http-server/start-server! :port config/default-http-port))

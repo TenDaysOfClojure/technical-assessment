@@ -39,12 +39,6 @@ Environment Variables.
 clj -M -m technical-assessment.core
 ```
 
-To start the HTTP server on the specific port (7777), from a new terminal use the following command:
-
-```
-clj -M -m technical-assessment.core http-port 7777
-```
-
 ### Running tests
 
 To run unit tests, from a new terminal use the following command:
@@ -55,35 +49,21 @@ clj -X:test
 
 ### Environment Variables Documentation
 
-The `technical-assessment.config` namespace uses the following environment variables:
+The following environment variables are supported:
 
-1. **FACEBOOK_AUTH_APP_ID**
-   - **Description**: The App ID for Facebook authentication.
-   - **Usage**: Used in `facebook-auth-config` to set the `:app-id`.
+- **FACEBOOK_AUTH_APP_ID** - The App ID for Facebook authentication
 
-2. **FACEBOOK_AUTH_SECRET**
-   - **Description**: The client secret for Facebook authentication.
-   - **Usage**: Used in `facebook-auth-config` to set the `:client-secret`.
+- **FACEBOOK_AUTH_SECRET** - The client secret for Facebook authentication
 
-3. **FACEBOOK_AUTH_REDIRECT_URL**
-   - **Description**: The redirect URI for Facebook authentication.
-   - **Usage**: Used in `facebook-auth-config` to set the `:redirect-uri`.
+- **FACEBOOK_AUTH_REDIRECT_URL** The redirect URI for Facebook authentication. Use "http://localhost:3000/auth/facebook/callback" for local development
 
-4. **CLOUDINARY_CLOUD_NAME**
-   - **Description**: The Cloudinary cloud name.
-   - **Usage**: Used in `default-cloudinary-config` to set the `:cloud-name`.
+- **CLOUDINARY_CLOUD_NAME** The Cloudinary cloud name
 
-5. **CLOUDINARY_API_KEY**
-   - **Description**: The API key for Cloudinary.
-   - **Usage**: Used in `default-cloudinary-config` to set the `:api-key`.
+- **CLOUDINARY_API_KEY** - The API key for Cloudinary
 
-6. **CLOUDINARY_API_SECRET**
-   - **Description**: The API secret for Cloudinary.
-   - **Usage**: Used in `default-cloudinary-config` to set the `:api-secret`.
+- **CLOUDINARY_API_SECRET** - The API secret for Cloudinary
 
-7. **PROD**
-   - **Description**: Indicates if the environment is production.
-   - **Usage**: Used in `production-environment?` to determine if the environment is production.
+- **PRODUCTION_ENV** - Indicates if the environment is production
 
 ### Example of Starting a REPL with Environment Variables
 
@@ -92,9 +72,20 @@ To start a REPL with the required environment variables, you can use the followi
 ```sh
 FACEBOOK_AUTH_APP_ID=your_facebook_app_id \
 FACEBOOK_AUTH_SECRET=your_facebook_secret \
-FACEBOOK_AUTH_REDIRECT_URL=your_facebook_redirect_url \
+FACEBOOK_AUTH_REDIRECT_URL="http://localhost:3000/auth/facebook/callback" \
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name \
 CLOUDINARY_API_KEY=your_cloudinary_api_key \
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret \
 clj -M:repl
+```
+
+
+```sh
+FACEBOOK_AUTH_APP_ID=your_facebook_app_id \
+FACEBOOK_AUTH_SECRET=your_facebook_secret \
+FACEBOOK_AUTH_REDIRECT_URL="http://localhost:3000/auth/facebook/callback" \
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name \
+CLOUDINARY_API_KEY=your_cloudinary_api_key \
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret \
+clj -M -m technical-assessment.core
 ```
