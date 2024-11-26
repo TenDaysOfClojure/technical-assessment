@@ -1,5 +1,32 @@
 # Technical assessment
 
+## Objective
+
+> Create a Clojure-based web app that allows users to sign up via Facebook, retrieves user details (first name, last name, email, and profile picture), and saves this data to a local database. The profile picture should be retrieved from Facebook and uploaded to Cloudinary, and the Cloudinary URL should be stored in the local database.
+
+
+## Requirements and Key Features
+
+- User Signup with Facebook
+  - Implement Facebook Login using the Facebook API
+  - Retrieve user information such as:
+    - First Name
+    - Last Name
+    - Email Address
+    - Profile Picture URL
+  - This will require setting up a Facebook Developer Account and registering an application in development mode to obtain credentials (App ID, Secret)
+- Data Storage
+  - Save the retrieved user details in a database
+  - The database can be any preferred option
+- Profile Picture processing
+  - Retrieve the user’s profile picture from Facebook using the URL provided via the Facebook API
+  - Upload the profile picture to Cloudinary
+  - Save the Cloudinary URL of the uploaded image to the user’s record in the database
+  - This will require setting up a Cloudinary account to create an API key and secret
+- Consider error handling and testing where appropriate
+
+
+
 ## Development environment
 
 ### Start a REPL
