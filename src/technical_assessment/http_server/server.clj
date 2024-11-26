@@ -1,7 +1,7 @@
-(ns technical-assessment.http-server
+(ns technical-assessment.http-server.server
   (:require [taoensso.timbre :as logger]
             [ring.adapter.jetty :as jetty]
-            [technical-assessment.routes :as http-routes]))
+            [technical-assessment.http-server.routes :as http-routes]))
 
 
 (defonce http-servers (atom {}))

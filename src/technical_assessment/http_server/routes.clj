@@ -1,11 +1,11 @@
-(ns technical-assessment.routes
+(ns technical-assessment.http-server.routes
   (:require
    ;; HTTP / Web server
    [compojure.core :refer [defroutes GET]]
    [compojure.route :as route]
    [ring.util.response :as response]
    [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-   [technical-assessment.middleware :refer [wrap-exceptions]]
+   [technical-assessment.http-server.middleware :refer [wrap-exceptions]]
 
    ;; Intergation
    [technical-assessment.integration.cloudinary :as integration.cloudinary]
@@ -17,7 +17,7 @@
    [technical-assessment.urls :as urls]
 
    ;; Sever side rendering, layouts and content etc
-   [technical-assessment.render-html :as html]
+   [technical-assessment.http-server.render-html :as html]
    [technical-assessment.ux.pages.home :as home-page]
    [technical-assessment.ux.pages.general :as general-pages]
    [technical-assessment.ux.pages.user :as user-pages]
@@ -127,7 +127,7 @@
 
   ;; General 404 / page not found handler,
   ;; Note the 500 / unexpected error handler is implemented as middleware
-  ;; in `technical-assessment.middleware/wrap-exceptions`.
+  ;; in `technical-assessment.http-server.middleware/wrap-exceptions`.
   (route/not-found (html/render
                     (general-pages/not-found-page))))
 

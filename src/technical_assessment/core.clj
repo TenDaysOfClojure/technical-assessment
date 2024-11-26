@@ -1,6 +1,6 @@
 (ns technical-assessment.core
   (:require [technical-assessment.config :as config]
-            [technical-assessment.http-server :as http-server]))
+            [technical-assessment.http-server.server :as http-server]))
 
 
 ;; Main entry point for HTTP server when run using:

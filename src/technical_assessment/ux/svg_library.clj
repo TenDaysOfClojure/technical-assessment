@@ -2,15 +2,15 @@
 
 
 (defn with-svg-defaults [attributes]
-  (assoc attributes
-         :xmlns "http://www.w3.org/2000/svg"
-         :fill "currentColor"))
+  (assoc attributes :xmlns "http://www.w3.org/2000/svg" :fill "currentColor"))
 
 
 (defn with-standard-icon-size [attributes]
-  (assoc attributes
-         :width "30px"
-         :height "30px"))
+  (assoc attributes :width "30px" :height "30px"))
+
+
+(defn with-viewbox [attributes view-box]
+  (assoc attributes :viewBox (str "0 0 " view-box)))
 
 
 (defn path-element [path]
@@ -18,14 +18,14 @@
 
 
 (defn svg [attributes path]
-  [:svg.mr-3 attributes (path-element path)])
-
+  [:svg.mr-2 attributes (path-element path)])
 
 ;; -- Icon libarary --
 
 (def facebook-icon
   (svg
-   (-> {:viewBox "0 0 320 512"}
+   (-> {}
+       (with-viewbox "320 512")
        (with-svg-defaults)
        (with-standard-icon-size))
 
@@ -34,7 +34,8 @@
 
 (def info-icon
   (svg
-   (-> {:viewBox "0 0 512 512"}
+   (-> {}
+       (with-viewbox "512 512")
        (with-svg-defaults)
        (with-standard-icon-size))
 
@@ -43,7 +44,8 @@
 
 (def warning-icon
   (svg
-   (-> {:viewBox "0 0 576 512"}
+   (-> {}
+       (with-viewbox "576 512")
        (with-svg-defaults)
        (with-standard-icon-size))
 
@@ -52,10 +54,9 @@
 
 (def email-icon
   (svg
-   (-> {:viewBox "0 0 512 512"}
+   (-> {}
+       (with-viewbox "512 512")
        (with-svg-defaults)
        (with-standard-icon-size))
 
-   "M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48L48 64zM0 176L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-208L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z")
-
-  )
+   "M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48L48 64zM0 176L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-208L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"))

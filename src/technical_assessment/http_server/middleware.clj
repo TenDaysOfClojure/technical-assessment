@@ -1,6 +1,6 @@
-(ns technical-assessment.middleware
+(ns technical-assessment.http-server.middleware
   (:require [taoensso.timbre :as logger]
-            [technical-assessment.render-html :as html]
+            [technical-assessment.http-server.render-html :as html]
             [technical-assessment.ux.pages.general :as general-pages]))
 
 
