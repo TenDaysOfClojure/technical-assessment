@@ -4,9 +4,11 @@
             [camel-snake-kebab.core :as casing]))
 
 
+
+
 (defn find-facebook-user [facebook-auth-config code]
   (let [token-resp    (client/post
-                       "https://graph.facebook.com/v10.0/oauth/access_token"
+                       "https://graph.facebook.com/v21.0/oauth/access_token"
                        {:form-params {:client_id (:app-id facebook-auth-config)
                                       :redirect_uri (:redirect-uri facebook-auth-config)
                                       :client_secret (:client-secret facebook-auth-config)
@@ -33,7 +35,7 @@
   a given `action` which can be `sign-up` or `login` that is passed to the authentication
   callback as the `state` querystring parameter."
   [facebook-auth-config action]
-  (str "https://www.facebook.com/v10.0/dialog/oauth?client_id=" (:app-id facebook-auth-config)
+  (str "https://www.facebook.com/v21.0/dialog/oauth?client_id=" (:app-id facebook-auth-config)
        "&redirect_uri=" (:redirect-uri facebook-auth-config) "&scope=email"
        ;; Note we use Facebook login API `state` param to pass the action to take
        ;; The `response_type` querystring must be `code` for this to work.
