@@ -10,7 +10,7 @@
    [taoensso.timbre :as logger]
 
    ;; Intergation
-   [technical-assessment.integration.facebook-auth :as integration.facebook-auth]
+   [technical-assessment.integration.facebook.auth :as integration.facebook-auth]
    [technical-assessment.database.core :as database]
 
    ;; General config

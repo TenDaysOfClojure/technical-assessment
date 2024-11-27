@@ -1,4 +1,4 @@
-(ns technical-assessment.domain.facebook-user)
+(ns technical-assessment.integration.facebook.user)
 
 ;; -- Start Field getters --
 ;;

@@ -1,10 +1,10 @@
 (ns technical-assessment.domain.user
   (:require [clojure.string :as string]
             [technical-assessment.integration.cloudinary :as integration.cloudinary]
-            [technical-assessment.integration.facebook-auth :as integration.facebook-auth]
+            [technical-assessment.integration.facebook.auth :as integration.facebook-auth]
             [technical-assessment.database.core :as database]
             [technical-assessment.config :as config]
-            [technical-assessment.domain.facebook-user :as facebook-user]))
+            [technical-assessment.integration.facebook.user :as facebook-user]))
 
 
 ;; -- Start Field getters --
