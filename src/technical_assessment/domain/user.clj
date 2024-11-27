@@ -4,7 +4,7 @@
             [technical-assessment.integration.facebook.auth :as integration.facebook-auth]
             [technical-assessment.database.core :as database]
             [technical-assessment.config :as config]
-            [technical-assessment.integration.facebook.user :as facebook-user]))
+            [technical-assessment.integration.facebook.user :as integration.facebook-user]))
 
 
 ;; -- Start Field getters --
@@ -31,15 +31,16 @@
 
 ;; -- End Field getters --
 
+
 (defn user-details-for-login-or-sign-up [facebook-user cloudinary-result]
   {;; Profile details pulled from facebook
-   :user/first-name (facebook-user/first-name facebook-user)
+   :user/first-name (integration.facebook-user/first-name facebook-user)
 
-   :user/last-name (facebook-user/last-name facebook-user)
+   :user/last-name (integration.facebook-user/last-name facebook-user)
 
-   :user/full-name (facebook-user/full-name facebook-user)
+   :user/full-name (integration.facebook-user/full-name facebook-user)
 
-   :user/email-address (facebook-user/email-address facebook-user)
+   :user/email-address (integration.facebook-user/email-address facebook-user)
 
    :user/profile-pic-url (integration.cloudinary/secure-url cloudinary-result)
 
@@ -65,7 +66,7 @@
                           config/facebook-auth-config
                           facebook-auth-code)
 
-        facebook-user-id (facebook-user/user-id facebook-user)
+        facebook-user-id (integration.facebook-user/user-id facebook-user)
 
         base-user        (if-let [user (database/find-entity
                                         (config/current-database)
@@ -78,7 +79,7 @@
                            {:entity/id (database/new-entity-id)
                             :user.auth.facebook/user-id facebook-user-id})
 
-        profile-pic-url   (facebook-user/profile-picture-url facebook-user)
+        profile-pic-url   (integration.facebook-user/profile-picture-url facebook-user)
 
         cloudinary-result (integration.cloudinary/upload-image-using-image-url
                            config/default-cloudinary-config

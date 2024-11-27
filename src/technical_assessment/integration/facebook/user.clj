@@ -1,5 +1,20 @@
 (ns technical-assessment.integration.facebook.user)
 
+;; Example Facebook user model:
+;;
+;; {:id "111111222223333"
+;;  :first-name "Joe"
+;;  :last-name "Soap"
+;;  :email "joesoap@mailinator.com"
+;;  :picture
+;;  {:data
+;;   {:height 1724
+;;    :is-silhouette false
+;;    :url
+;;    "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=111111222223333&height=2048&width=2048&ext=1",
+;;    :width 1724}}}
+
+
 ;; -- Start Field getters --
 ;;
 ;; These field getters provide a standard, centralised way to access fields in a map.
