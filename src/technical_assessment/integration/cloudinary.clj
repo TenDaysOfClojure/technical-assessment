@@ -6,6 +6,12 @@
             [camel-snake-kebab.core :as casing]
             [clojure.string :as string]))
 
+;; -- Start Field getters --
+;;
+;; These field getters provide a standard, centralised way to access fields in a map.
+;; This prevents developers needing to know the specific key a given field uses
+;; and prevents multiple places in the code that use either `get` or `get-in` on a map
+;; that represents this domain object.
 
 (defn secure-url [{:keys [secure-url]}]
   secure-url)
@@ -21,6 +27,8 @@
 
 (defn file-format [{:keys [format]}]
   format)
+
+;; -- End Field getters --
 
 
 (defn upload-image-using-image-url
@@ -55,4 +63,5 @@
 
         result-info (json/decode (:body response)
                                  casing/->kebab-case-keyword)]
+
     result-info))

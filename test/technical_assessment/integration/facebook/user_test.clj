@@ -1,5 +1,5 @@
 (ns technical-assessment.integration.facebook.user-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [clojure.test :refer :all]
             [technical-assessment.integration.facebook.user :as integration.facebook-user]))
 
 ;; This is a sample of what is returned by `technical-assessment.integration.facebook.auth/find-facebook-user
