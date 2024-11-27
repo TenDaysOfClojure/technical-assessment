@@ -7,7 +7,7 @@
 ;;
 ;; clj -M -m technical-assessment.core
 
-(defn -main [_]
+(defn -main [& _]
 
   (config/setup-config!)
 
