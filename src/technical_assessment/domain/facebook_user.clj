@@ -1,5 +1,12 @@
 (ns technical-assessment.domain.facebook-user)
 
+;; -- Start Field getters --
+;;
+;; These field getters provide a standard, centralised way to access fields in a map.
+;; This prevents developers needing to know the specific key a given field uses
+;; and prevents multiple places in the code that use either `get` or `get-in` on a map
+;; that represents this domain object.
+
 
 (defn user-id [{:keys [id]}]
   id)
@@ -23,3 +30,5 @@
 
 (defn email-address [{:keys [email]}]
   email)
+
+;; -- End Field getters --
