@@ -52,9 +52,17 @@
                ;; TODO - Support remote node in else statement
                )]
 
-    {:save-entity(fn [entity-kind entity]
-       (xt/execute-tx node
-                      [[:put-docs entity-kind (->persistable-entity entity)]]))
+    {:save-entity
+     (fn [entity-kind entity]
+       (let [entity-id       (:entity/id entity)
+
+             entity          (->persistable-entity entity)
+
+             {:keys [tx-id]} (xt/execute-tx
+                              node
+                              [[:put-docs entity-kind entity]])]
+
+         {:tx-id tx-id :entity/id entity-id}))
 
 
      :find-entity-by-id
@@ -69,16 +77,23 @@
 
 
      :find-all-entities
-     (fn [entity-type])}))
+     (fn [entity-kind]
+       (let [table (name entity-kind)
+
+             query (str "select * from " table )]
+
+         (map ->domain-entity
+              (xt/q node query))))
 
 
-(comment
+     :query
+     (fn [query query-params]
+       (prn query query-params)
+       (map ->domain-entity
+            (xt/q node query query-params)))
 
-  (let [db (get-db :in-process)]
-
-    #_((:save-entity db) :users {:entity/id "AB" :user/first-name "Joe"})
-
-    ((:find-entity-by-id db) :users  "AB"))
-
-
-  )
+     :query-one
+     (fn [query query-params]
+       (-> (xt/q node query query-params)
+           (first)
+           (->domain-entity)))}))

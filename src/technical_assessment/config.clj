@@ -2,8 +2,8 @@
   (:require [clojure.string :as string]
             [taoensso.timbre :as logger]
             [clojure.pprint]
-            [technical-assessment.database.mock-db :as mock-db]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [technical-assessment.database.xtdb :as database.xtdb])
 
   (:import java.util.Base64))
 
@@ -108,16 +108,19 @@
   (check-config-map! "Cloudinary" default-cloudinary-config))
 
 
-(def mock-db (when (development-environment?)
-               (mock-db/get-db "db.edn")))
+(def development-and-testing-database
+  (when (development-environment?)
+    ;; We use the in-process XTDB  database for development / testing
+    (database.xtdb/get-db :in-process)))
 
 
 (defn current-database []
   (if (development-environment?)
-    mock-db
-    ;; Only development is supported in v1
+    development-and-testing-database
+    ;; Only development database is supported in v1
     (throw
      (Exception. "Production database not yet implemented." {}))))
+
 
 (defn setup-config! []
   (enable-minimal-logging!)

@@ -58,6 +58,23 @@
    (integration.cloudinary/file-format cloudinary-result)})
 
 
+(defn find-user-by-facebook-id [database facebook-user-id]
+  ;;{:user.auth.facebook/user-id facebook-user-id}
+  ;; Note we are using XTDB XTSQL query language here now that the database is XTDB
+  (database/query-one database
+                      '(from :users
+                             [{:user.auth.facebook/user-id $facebook-user-id}])
+                      {:args {:facebook-user-id facebook-user-id}}))
+
+
+(comment
+  (database/save-entity database
+                        :users
+                        {:entity/id "111_XTDB"
+                         :user.auth.facebook/user-id "111"})
+
+  (find-user-by-facebook-id (config/current-database) "111"))
+
 (defn login-or-sign-up-user-via-facebook
   "Logs in or signs up a user via facebook using the given `facebook-auth-code`
   which is provided by the facebook authentication callback."
@@ -68,10 +85,7 @@
 
         facebook-user-id (integration.facebook-user/user-id facebook-user)
 
-        base-user        (if-let [user (database/find-entity
-                                        (config/current-database)
-                                        :users
-                                        {:user.auth.facebook/user-id facebook-user-id})]
+        base-user        (if-let [user (find-user-by-facebook-id facebook-user-id)]
                            ;; Existing entity in database
                            user
 

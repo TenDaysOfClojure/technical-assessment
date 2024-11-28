@@ -1,45 +1,55 @@
 (ns xtdb-scratch
-  (:require [xtdb.node :as xtn]
-            [xtdb.client :as xtc]
-            [xtdb.api :as xt]))
+  (:require
+            #_[xtdb.client :as xtc]
+            [technical-assessment.database.core :as database]
+            [technical-assessment.database.xtdb :as xtdb.database]))
 
 
 (comment
 
 
-  ;; Remote XTDB node
-  (let [node-address "http://localhost:6543"]
-    (with-open [node (xtc/start-client node-address)]
-      (xt/status node)
-
-      #_(xt/execute-tx node
-                     [[:put-docs :comments {:xt/id (random-uuid), :post-id "my-post-id"}]])
+  (def database (xtdb.database/get-db :in-process))
 
 
-      (xt/q node '(from :comments [xt/id post-id]))
-
-      ))
-
-  ;; In process node
-  ;; Local issues:
-  ;;  Caused by java.lang.IllegalStateException
-  ;; Memory was leaked by query. Memory leaked: (16384) Allocator(ROOT)
-  ;;
-  ;; Requires
-  ;;
-  ;;
-  (def in-memory-node (xtn/start-node))
-
-  (xt/status in-memory-node)
-
-  (xt/submit-tx in-memory-node
-                [[:put-docs :comments {:xt/id (random-uuid),
-                                       :post-id "my-post-id-"}]])
+  (def new-entity-id (database/new-entity-id))
 
 
-  (xt/q in-memory-node '(from :comments [xt/id post-id]))
+  ;; Persistence / Upsert
+
+  (database/save-entity database
+                        :comments
+                        {:entity/id new-entity-id
+                         :post-id "my-post-id"
+                         :content "This is a comment"})
+
+  ;; Finders
+
+  (database/find-all-entities database :comments)
 
 
+  (database/find-entity-by-id database :comments new-entity-id)
+
+
+  ;; Query (returns a collection of results)
+
+  (database/query database
+                  '(from :comments [xt/id post-id]))
+
+  (database/query database
+                  '(from :comments [{:xt/id $entity} *])
+                  {:args {:entity new-entity-id}})
+
+  ;; Query one (returns a the single, first result of the query)
+
+  (database/query-one database
+                      '(from :comments [xt/id post-id]))
+
+  (database/query-one database
+                      '(from :comments [{:xt/id $entity} *])
+                      {:args {:entity new-entity-id}})
+
+  ;; Remote node
+  #_(xtc/start-client node-address)
 
 
   )

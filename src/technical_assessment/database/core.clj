@@ -16,24 +16,36 @@
     (handler entity-type entity-details)))
 
 
+(defn find-all-eintities [db entity-type]
+  (let [handler (:find-all-entities db)]
+    (handler entity-type)))
+
+
 (defn find-entity-by-id [db entity-type entity-id]
   (let [handler (:find-entity-by-id db)]
     (handler entity-type entity-id)))
 
 
-(defn find-all-entities [db entity-type]
-  (let [handler (:find-all-entities db)]
-    (handler entity-type)))
+(defn query
+  ([db query-to-run]
+   (query db query-to-run {}))
+
+  ([db query-to-run query-params]
+   (let [handler (:query db)]
+     (handler query-to-run query-params))))
 
 
-(defn find-entity [db entity-type query]
-  (->> (find-all-entities db entity-type)
-       (filter (fn [entity]
-                 (every? (fn [[query-key query-value]]
-                           (= (get entity query-key) query-value))
-                         query)))
-       (first)))
+(defn query-one
+  ([db query-to-run]
+   (query-one db query-to-run {}))
+
+  ([db query-to-run query-params]
+   (let [handler (:query-one db)]
+     (handler query-to-run query-params))))
 
 
-(defn entity-exists? [db entity-type query]
-  (not (nil? (find-entity db entity-type query))))
+(defn entity-exists? [db query]
+  (let [handler (:entity-exists? db)]
+    (if handler
+      (handler query)
+      (not (nil? (query-one db query))))))
