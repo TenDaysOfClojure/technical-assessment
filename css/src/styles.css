@@ -19,16 +19,12 @@
 
 @layer components {
 
-  .info-alert {
-    @apply p-4 mb-4 text-blue-800 rounded-lg bg-blue-50 w-auto flex items-center justify-center;
-  }
-
   .warning-alert {
-    @apply p-4 mb-4 text-yellow-800 rounded-lg bg-yellow-50 w-auto flex items-center justify-center;
+    @apply p-4 mb-4 text-yellow-800 rounded-lg bg-yellow-50 w-auto flex flex-col items-center justify-center space-y-2;
   }
 
   .error-alert {
-    @apply p-4 mb-4 text-red-800 rounded-lg bg-red-50 w-auto flex items-center justify-center;
+    @apply p-4 mb-4 text-red-800 rounded-lg bg-red-50 w-auto flex flex-col items-center justify-center space-y-2;
   }
 
   .facebook-login-button {

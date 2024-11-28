@@ -4,7 +4,8 @@
             [technical-assessment.integration.facebook.auth :as integration.facebook-auth]
             [technical-assessment.database.core :as database]
             [technical-assessment.config :as config]
-            [technical-assessment.integration.facebook.user :as integration.facebook-user]))
+            [technical-assessment.integration.facebook.user :as integration.facebook-user]
+            [taoensso.timbre :as logger]))
 
 
 ;; -- Start Field getters --
@@ -63,17 +64,12 @@
   ;; Note we are using XTDB XTSQL query language here now that the database is XTDB
   (database/query-one database
                       '(from :users
-                             [{:user.auth.facebook/user-id $facebook-user-id}])
+                             [{:user.auth.facebook/user-id $facebook-user-id} *])
                       {:args {:facebook-user-id facebook-user-id}}))
 
 
-(comment
-  (database/save-entity database
-                        :users
-                        {:entity/id "111_XTDB"
-                         :user.auth.facebook/user-id "111"})
-
-  (find-user-by-facebook-id (config/current-database) "111"))
+(defn save-user [database user-details]
+  (database/save-entity database :users user-details))
 
 (defn login-or-sign-up-user-via-facebook
   "Logs in or signs up a user via facebook using the given `facebook-auth-code`
@@ -83,9 +79,12 @@
                           config/facebook-auth-config
                           facebook-auth-code)
 
-        facebook-user-id (integration.facebook-user/user-id facebook-user)
+        facebook-user-id (integration.facebook-user/user-id
+                          facebook-user)
 
-        base-user        (if-let [user (find-user-by-facebook-id facebook-user-id)]
+        base-user        (if-let [user (find-user-by-facebook-id
+                                        (config/current-database)
+                                        facebook-user-id)]
                            ;; Existing entity in database
                            user
 
@@ -108,11 +107,10 @@
         user-details      (merge
                            base-user
                            (user-details-for-login-or-sign-up facebook-user
-                                                              cloudinary-result))
+                                                              cloudinary-result))]
 
-        ;; Always save the user with the latest details
-        saved?            (database/save-entity (config/current-database)
-                                                :users
-                                                user-details)]
+    (logger/debug "Saving user details to database" user-details)
+
+    (save-user (config/current-database) user-details)
 
     user-details))

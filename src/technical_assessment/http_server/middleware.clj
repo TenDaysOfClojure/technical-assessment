@@ -21,15 +21,15 @@
                 (general-pages/unexpected-error-page))}))))
 
 
-(def logger-keys-to-redact #{"x-api-key"
-                             "api-key"
-                             "password"
-                             "email-address"
-                             "username"
-                             "Authorization"
-                             "authorization-token"
-                             "user-authorisation-token"
-                             "code"})
+(def logger-keys-to-redact #{:x-api-key
+                             :api-key
+                             :password
+                             :email-address
+                             :username
+                             :authorization
+                             :authorization-token
+                             :user-authorisation-token
+                             :code})
 
 ;; Defines a custom request logger that creates spacious logging by putting a newline
 ;; between logging outputs to make it slighlty more readable

@@ -1,9 +1,6 @@
 (ns xtdb-scratch
-  (:require
-            #_[xtdb.client :as xtc]
-            [technical-assessment.database.core :as database]
+  (:require [technical-assessment.database.core :as database]
             [technical-assessment.database.xtdb :as xtdb.database]))
-
 
 (comment
 
@@ -32,12 +29,13 @@
 
   ;; Query (returns a collection of results)
 
-  (database/query database
-                  '(from :comments [xt/id post-id]))
+  (database/query database '(from :comments [xt/id post-id]))
+
 
   (database/query database
                   '(from :comments [{:xt/id $entity} *])
                   {:args {:entity new-entity-id}})
+
 
   ;; Query one (returns a the single, first result of the query)
 
@@ -47,9 +45,5 @@
   (database/query-one database
                       '(from :comments [{:xt/id $entity} *])
                       {:args {:entity new-entity-id}})
-
-  ;; Remote node
-  #_(xtc/start-client node-address)
-
 
   )

@@ -2,7 +2,8 @@
   (:require [xtdb.node :as xtn]
             [xtdb.client :as xtc]
             [xtdb.api :as xt]
-            [clojure.set]))
+            [clojure.set]
+            [xtdb.client :as xtc]))
 
 
 (defonce server (atom nil))
@@ -49,7 +50,9 @@
 
   (let [node (if (= database-type :in-process)
                (get-in-memory-node)
-               ;; TODO - Support remote node in else statement
+
+               ;; Assumes remote node
+               #_(xtc/start-client node-address)
                )]
 
     {:save-entity
