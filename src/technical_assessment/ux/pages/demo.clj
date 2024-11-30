@@ -45,7 +45,4 @@
 
     (common/error-alert
      :icon? false
-     :message "This is a demo page that showcases the various UI components and layouts used in the application.")
-
-
-    ]))
+     :message "This is a demo page that showcases the various UI components and layouts used in the application.")]))
