@@ -53,21 +53,15 @@
     (clojure.set/rename-keys entity {:xt/id :entity/id})))
 
 
-;; Note this returns a map of functions intead of a CLojure protocal https://clojure.org/reference/protocols
-;; Clojure protocals are great but have a high learning curve for juniors
-;; and less experienced clojure developers so this provides a good alternative that uses minimal clojure
-;; lanage feature
-
 (defn get-db
-  "`database-type` can be either `:in-process` or `:remote-node`"
-  [database-type]
+  "`database-type` can be either `in-process` or `:remote-node`"
+  [node-address]
 
-  (if (= database-type :in-process)
+  (if (= node-address "in-process")
     (get-in-memory-node)
 
     ;; Assumes remote node
-    #_(xtc/start-client node-address)
-    ))
+    (get-remote-node node-address)))
 
 
 (defn save-entity [node entity-kind entity]

@@ -22,6 +22,7 @@
    [technical-assessment.ux.pages.home :as home-page]
    [technical-assessment.ux.pages.general :as general-pages]
    [technical-assessment.ux.pages.user :as user-pages]
+   [technical-assessment.ux.pages.demo :as demo-pages]
    [technical-assessment.domain.user :as domain.user]))
 
 
@@ -34,6 +35,8 @@
   (GET "/sample-error" []
        (throw (Exception. "This is a sample / test error")))
 
+  (GET "/ux/demo" []
+        (html/render (demo-pages/story-book)))
 
   ;; Handles sign-up and login actions via a URL param named :action
   (GET (str urls/auth-facebook-base-route "/:action")  [action]

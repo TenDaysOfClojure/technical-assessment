@@ -120,15 +120,15 @@
   (check-config-map! "Cloudinary" default-cloudinary-config))
 
 
-(def development-and-testing-database
-  (when (development-environment?)
-    ;; We use the in-process XTDB  database for development / testing
-    (database.xtdb/get-db :in-process)))
+;; -- Database --
+
+(def xtdb-node-type (or (System/getenv "XTDB_NODE_TYPE")
+                        "in-process"))
 
 
 (defn current-database []
   (if (development-environment?)
-    development-and-testing-database
+    (database.xtdb/get-db xtdb-node-type)
     ;; Only development database is supported in v1
     (throw
      (Exception. "Production database not yet implemented." {}))))
