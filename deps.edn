@@ -40,11 +40,14 @@
         ;; xtdb-core for running an in-process (test) node (JDK 21+)
         com.xtdb/xtdb-core {:mvn/version "2.0.0-beta3"}}
 
- :aliases {:run {:main-opts ["-m" "technical-assessment.core"]}
+ :aliases {:run {:main-opts ["-m" "technical-assessment.core"]
+                 ;; JVM options required for XTDB in-process node (dev/testing only)
+                 :jvm-opts ["--add-opens=java.base/java.nio=ALL-UNNAMED"
+                            "-Dio.netty.tryReflectionSetAccessible=true"]}
 
            :repl {:extra-paths ["dev"] ;; Include dev only source code
 
-                   ;; JVM options required for XTDB in-process node (dev/testing only)
+                  ;; JVM options required for XTDB in-process node (dev/testing only)
                   :jvm-opts ["--add-opens=java.base/java.nio=ALL-UNNAMED"
                              "-Dio.netty.tryReflectionSetAccessible=true"]
 
