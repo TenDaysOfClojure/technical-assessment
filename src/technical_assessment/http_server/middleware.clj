@@ -31,6 +31,7 @@
                              :user-authorisation-token
                              :code})
 
+
 ;; Defines a custom request logger that creates spacious logging by putting a newline
 ;; between logging outputs to make it slighlty more readable
 (defrecord WebRequestLogger []
@@ -40,6 +41,4 @@
 
   (log [_ level throwable message]
     (timbre-logger/log level throwable message)
-
-    #_(.write *out* "\n")
     (flush)))

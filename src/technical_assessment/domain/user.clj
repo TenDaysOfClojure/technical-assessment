@@ -71,11 +71,12 @@
 (defn save-user [database user-details]
   (database/save-entity database :users user-details))
 
+
 (defn login-or-sign-up-user-via-facebook
   "Logs in or signs up a user via facebook using the given `facebook-auth-code`
   which is provided by the facebook authentication callback."
   [facebook-auth-code]
-  (let [facebook-user    (integration.facebook-auth/find-facebook-user
+  (let [facebook-user    (integration.facebook-auth/get-facebook-user
                           config/facebook-auth-config
                           facebook-auth-code)
 

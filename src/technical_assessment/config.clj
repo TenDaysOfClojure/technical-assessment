@@ -1,8 +1,9 @@
 (ns technical-assessment.config
   (:require [clojure.string :as string]
             [taoensso.timbre :as logger]
+            [clj-http.client :as http]
+            [camel-snake-kebab.core :as key-transforms]
             [clojure.pprint]
-            [clojure.java.io :as io]
             [technical-assessment.database.xtdb :as database.xtdb])
 
   (:import java.util.Base64))
@@ -74,6 +75,17 @@
                          (Integer/parseInt http-port)
                          ;; Defaults HTTP port to 3000
                          3000))
+
+;; For: clj-http.client
+;; register your own body coercers by participating in the coerce-response-body multimethod
+;; dispatch to it by using {:as :json-kebab-keys} as an argument to http client calls
+
+;; The below uses camel-snake-kebab library to turn a camel-cased JSON API into
+;; idiomatic kebab-cased keywords in clojure data structures and is much
+;; faster than applying via postwalk or similar
+
+(defmethod http/coerce-response-body :json-kebab-keys [req resp]
+  (http/coerce-json-body req resp (memoize key-transforms/->kebab-case-keyword) false))
 
 
 ;; -- Facebook auth config --

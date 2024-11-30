@@ -6,24 +6,38 @@
             [xtdb.client :as xtc]))
 
 
-(defonce server (atom nil))
+(defonce in-memory-node (atom nil))
 
 
 (defn- get-in-memory-node []
-  (if-let [running-node @server]
+  (if-let [running-node @in-memory-node]
     ;; If there is an existing, running node use it.
     running-node
 
     ;; Otherwise start a new node and store it in the atom
     ;; so it can be reused in further function calls
     (let [node (xtn/start-node)]
-      (reset! server node)
+      (reset! in-memory-node node)
+      node)))
+
+
+(defonce remote-node (atom nil))
+
+
+(defn- get-remote-node [node-url]
+  (if-let [running-node @remote-node]
+    ;; If there is an existing, running node use it.
+    running-node
+
+    ;; Otherwise start a new node and store it in the atom
+    ;; so it can be reused in further function calls
+    (let [node (xtc/start-client node-url)]
+      (reset! remote-node node)
       node)))
 
 
 (defn new-database-entity-id []
   (str (random-uuid)))
-
 
 
 (defn ->persistable-entity [entity]
@@ -48,55 +62,52 @@
   "`database-type` can be either `:in-process` or `:remote-node`"
   [database-type]
 
-  (let [node (if (= database-type :in-process)
-               (get-in-memory-node)
+  (if (= database-type :in-process)
+    (get-in-memory-node)
 
-               ;; Assumes remote node
-               #_(xtc/start-client node-address)
-               )]
-
-    {:save-entity
-     (fn [entity-kind entity]
-       (let [entity-id       (:entity/id entity)
-
-             entity          (->persistable-entity entity)
-
-             {:keys [tx-id]} (xt/execute-tx
-                              node
-                              [[:put-docs entity-kind entity]])]
-
-         {:tx-id tx-id :entity/id entity-id}))
+    ;; Assumes remote node
+    #_(xtc/start-client node-address)
+    ))
 
 
-     :find-entity-by-id
-     (fn [entity-kind id]
-       (let [table (name entity-kind)
+(defn save-entity [node entity-kind entity]
+  (let [entity-id       (:entity/id entity)
 
-             query (str "select * from " table " where _id = ?")]
+        entity          (->persistable-entity entity)
 
-         (-> (xt/q node query {:args [id]})
-             (first)
-             (->domain-entity))))
+        {:keys [tx-id]} (xt/execute-tx
+                         node
+                         [[:put-docs entity-kind entity]])]
 
-
-     :find-all-entities
-     (fn [entity-kind]
-       (let [table (name entity-kind)
-
-             query (str "select * from " table )]
-
-         (map ->domain-entity
-              (xt/q node query))))
+    {:tx-id tx-id :entity/id entity-id}))
 
 
-     :query
-     (fn [query query-params]
-       (prn query query-params)
-       (map ->domain-entity
-            (xt/q node query query-params)))
+(defn find-entity-by-id [node entity-kind id]
+  (let [table (name entity-kind)
 
-     :query-one
-     (fn [query query-params]
-       (-> (xt/q node query query-params)
-           (first)
-           (->domain-entity)))}))
+        query (str "select * from " table " where _id = ?")]
+
+    (-> (xt/q node query {:args [id]})
+        (first)
+        (->domain-entity))))
+
+
+(defn find-all-entities [node entity-kind]
+  (let [table (name entity-kind)
+
+        query (str "select * from " table )]
+
+    (map ->domain-entity
+         (xt/q node query))))
+
+
+(defn query [node query query-params]
+  (prn query query-params)
+  (map ->domain-entity
+       (xt/q node query query-params)))
+
+
+(defn query-one [node query query-params]
+  (-> (xt/q node query query-params)
+      (first)
+      (->domain-entity)))

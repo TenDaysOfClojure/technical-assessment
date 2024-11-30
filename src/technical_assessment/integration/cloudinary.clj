@@ -57,11 +57,8 @@
         params      {:multipart api-params
                      :headers {"Authorization"
                                (str "Basic " (config/cloudinary-authorisation-string
-                                              cloudinary-config))}}
+                                              cloudinary-config))}
+                     :as :json-kebab-keys}
 
-        response    (client/post url params)
-
-        result-info (json/decode (:body response)
-                                 casing/->kebab-case-keyword)]
-
-    result-info))
+        response    (client/post url params)]
+    (:body response)))

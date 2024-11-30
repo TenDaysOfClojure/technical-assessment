@@ -4,7 +4,6 @@
 
 (comment
 
-
   (def database (xtdb.database/get-db :in-process))
 
 
