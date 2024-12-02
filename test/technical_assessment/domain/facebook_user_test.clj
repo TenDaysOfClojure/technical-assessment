@@ -1,8 +1,8 @@
-(ns technical-assessment.domain.facebook-user-test
+(ns technical-assessment.integration.facebook.user-test
   (:require [clojure.test :refer [deftest is testing]]
-            [technical-assessment.domain.facebook-user :as facebook-user]))
+            [technical-assessment.integration.facebook.user :as facebook-user]))
 
-;; This is a sample of what is returned by `technical-assessment.integration.facebook-auth/find-facebook-user
+;; This is a sample of what is returned by `technical-assessment.integration.facebook.auth/find-facebook-user
 ;; which converts the JSON response from Facebook into a Clojure map and kebab-cases keywordizes the keys.
 (def sample-facebook-user
   {:id "111111222223333"

@@ -1,4 +1,4 @@
-(ns technical-assessment.integration.facebook-auth
+(ns technical-assessment.integration.facebook.auth
   (:require [clj-http.client :as client]
             [cheshire.core :as json]
             [camel-snake-kebab.core :as casing]))
