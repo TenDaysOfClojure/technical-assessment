@@ -5,7 +5,8 @@
    [compojure.route :as route]
    [ring.util.response :as response]
    [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-   [technical-assessment.http-server.middleware :refer [wrap-exceptions]]
+   [technical-assessment.http-server.middleware :as app-middleware]
+   [ring.logger :as logger]
 
    ;; Intergation
    [technical-assessment.integration.facebook-auth :as integration.facebook-auth]
@@ -73,4 +74,7 @@
 (def app
   (-> app-routes
       (wrap-defaults site-defaults)
-      (wrap-exceptions)))
+      (logger/wrap-with-logger {:timing false
+                                :logger (app-middleware/->WebRequestLogger)
+                                :redact-keys app-middleware/logger-keys-to-redact})
+      (app-middleware/wrap-exceptions)))

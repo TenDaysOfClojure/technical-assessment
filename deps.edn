@@ -8,6 +8,7 @@
         ring/ring-core {:mvn/version "1.9.4"}
         ring/ring-jetty-adapter {:mvn/version "1.9.4"}
         ring/ring-defaults {:mvn/version "0.3.3"}
+        ring-logger-timbre/ring-logger-timbre {:mvn/version "0.7.5"}
 
         ;; Routing & HTML rendering
         compojure/compojure {:mvn/version "1.7.1"}
