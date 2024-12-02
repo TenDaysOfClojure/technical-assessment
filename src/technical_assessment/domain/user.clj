@@ -7,6 +7,13 @@
             [technical-assessment.domain.facebook-user :as facebook-user]))
 
 
+;; -- Start Field getters --
+;;
+;; These field getters provide a standard, centralised way to access fields in a map.
+;; This prevents developers needing to know the specific key a given field uses
+;; and prevents multiple places in the code that use either `get` or `get-in` on a map
+;; that represents this domain object.
+
 (defn email-address [{:keys [user/email-address]}]
   email-address)
 
@@ -22,6 +29,7 @@
 (defn has-email-address? [user]
   (not (string/blank? (email-address user))))
 
+;; -- End Field getters --
 
 (defn user-details-for-login-or-sign-up [facebook-user cloudinary-result]
   {;; Profile details pulled from facebook
