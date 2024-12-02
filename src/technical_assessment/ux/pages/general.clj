@@ -1,6 +1,5 @@
 (ns technical-assessment.ux.pages.general
   (:require [technical-assessment.ux.layouts :as layouts]
-            [technical-assessment.ux.svg-library :as svg-library]
             [technical-assessment.ux.components.common :as common-components]))
 
 

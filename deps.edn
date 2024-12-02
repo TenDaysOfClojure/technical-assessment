@@ -1,11 +1,6 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
 
-       ;; REPL tools for improved REPL development
-        nrepl/nrepl {:mvn/version "0.8.3"}
-        refactor-nrepl/refactor-nrepl {:mvn/version "2.5.1"}
-        cider/cider-nrepl {:mvn/version "0.25.9"}
-
         ;; HTTP Server key dependencies
         ring/ring-core {:mvn/version "1.13.0"}
         ring/ring-jetty-adapter {:mvn/version "1.13.0"}
@@ -51,6 +46,10 @@
                   :jvm-opts ["--add-opens=java.base/java.nio=ALL-UNNAMED"
                              "-Dio.netty.tryReflectionSetAccessible=true"]
 
+                  ;; REPL tools for improved REPL development
+                  :extra-deps {nrepl/nrepl {:mvn/version "0.8.3"}
+                               refactor-nrepl/refactor-nrepl {:mvn/version "2.5.1"}
+                               cider/cider-nrepl {:mvn/version "0.25.9"}}
                   ;; These options config the cider middleware for REPL development
                   :main-opts ["-m"
                               "nrepl.cmdline"
