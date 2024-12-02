@@ -2,6 +2,8 @@
 ;; which supports both a mock database (see `technical-assessment.database.mock-db`)
 ;; and other database implemenations
 
+;; Subsequent versions will provide a https://xtdb.com provider
+
 (ns technical-assessment.database.core)
 
 

@@ -7,7 +7,7 @@
    [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
    [technical-assessment.middleware :refer [wrap-exceptions]]
 
-   ;; Intergatio
+   ;; Intergation
    [technical-assessment.integration.cloudinary :as integration.cloudinary]
    [technical-assessment.integration.facebook-auth :as integration.facebook-auth]
    [technical-assessment.database.core :as database]
@@ -20,7 +20,8 @@
    [technical-assessment.render-html :as html]
    [technical-assessment.ux.pages.home :as home-page]
    [technical-assessment.ux.pages.general :as general-pages]
-   [technical-assessment.ux.pages.user :as user-pages]))
+   [technical-assessment.ux.pages.user :as user-pages]
+   [taoensso.timbre :as logger]))
 
 
 (defroutes app-routes
@@ -45,6 +46,8 @@
 
        ;; TODO This route now contains in situ soluton to the tech assessment
        ;; the next step would be to refactor this into integration / domain code
+
+       (logger/info "Received Facebook auth callback with state: " state)
 
        (let [;; Note we use Facebook login API `state` param to pass the action to take
              ;; `state` is the name of the parameter facebook uses to allow including extra data
@@ -87,11 +90,6 @@
              {:keys [first-name
                      last-name
                      email]}       facebook-user
-
-             existing-user         (database/find-entity
-                                    (config/current-database)
-                                    :users
-                                    {:user.auth.facebook/user-id facebook-user-id})
 
              user-details          (merge base-user
                                           ;; This will always update the users details
