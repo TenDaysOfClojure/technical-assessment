@@ -1,9 +1,8 @@
 # CSS based on Tailwind https://tailwindcss.com
 
-Provides the main CSS assets used by the technical assessment web app found in the
-`web-app` directory.
+Provides the main CSS assets used by the technical assessment web app. CSS assets are output to the `/resources/public/css` directory by this process.
 
-CSS assets are output to the `/resources/public/css` directory.
+See https://tailwindcss.com for more information on Tailwind.
 
 ## Setup
 
@@ -11,7 +10,6 @@ To install the required dependancies run the following command in a new terminal
 in this directory:
 
 `npm install`
-
 
 ## Development
 

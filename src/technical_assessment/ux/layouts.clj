@@ -2,7 +2,7 @@
   (:require [technical-assessment.config :as config]))
 
 
-(defn main-layout [children]
+(defn main-layout [body]
   [:html
    [:head
     [:meta {:charset "UTF-8"}]
@@ -10,4 +10,4 @@
             :name "viewport"}]
     [:link {:rel "stylesheet" :href (config/main-css-path)}]]
 
-   [:body.main-body children]])
+   [:body.main-body body]])

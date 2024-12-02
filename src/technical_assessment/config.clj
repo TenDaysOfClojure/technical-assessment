@@ -51,7 +51,7 @@
 ;; -- Environment helpers --
 
 (defn production-environment? []
-  (= "true" (System/getenv "PROD")))
+  (= "true" (System/getenv "PRODUCTION_ENV")))
 
 
 (defn development-environment? []
@@ -70,7 +70,10 @@
       css-path)))
 
 
-(def default-http-port 3000)
+(def default-http-port (if-let [http-port (System/getenv "HTTP_PORT")]
+                         (Integer/parseInt http-port)
+                         ;; Defaults HTTP port to 3000
+                         3000))
 
 
 ;; -- Facebook auth config --
