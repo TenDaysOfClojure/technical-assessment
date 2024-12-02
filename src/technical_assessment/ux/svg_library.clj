@@ -18,7 +18,7 @@
 
 
 (defn svg [attributes path]
-  [:svg.mr-2 attributes (path-element path)])
+  [:svg.mr-2.inline-block attributes (path-element path)])
 
 ;; -- Icon libarary --
 
