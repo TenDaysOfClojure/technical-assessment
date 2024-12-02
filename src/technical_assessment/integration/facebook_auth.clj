@@ -4,8 +4,6 @@
             [camel-snake-kebab.core :as casing]))
 
 
-
-
 (defn find-facebook-user [facebook-auth-config code]
   (let [token-resp    (client/post
                        "https://graph.facebook.com/v21.0/oauth/access_token"
@@ -27,6 +25,8 @@
 
         user-details  (json/parse-string (:body user-response)
                                          casing/->kebab-case-keyword)]
+
+    (clojure.pprint/pprint user-details)
     user-details))
 
 

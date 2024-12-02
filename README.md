@@ -34,7 +34,7 @@
 To start a local nREPL (with CIDER and refactor-nrepl enabled) use the following
 commmand in a new terminal:
 
-* Note - see the [Environment Variables Documentation](https://github.com/TenDaysOfClojure/technical-assessment?tab=readme-ov-file#environment-variables-documentation) section for required 
+* Note - see the [Environment Variables Documentation](https://github.com/TenDaysOfClojure/technical-assessment?tab=readme-ov-file#environment-variables-documentation) section for required
 environment variables for integration configuration.
 
 ```bash
@@ -59,7 +59,7 @@ To confirm if the server is up and running, open a http://localhost:3000 in your
 
 To start the HTTP server on the default port (3000),  from a new terminal use the following command:
 
-* Note - see the [Environment Variables Documentation](https://github.com/TenDaysOfClojure/technical-assessment?tab=readme-ov-file#environment-variables-documentation) section for required 
+* Note - see the [Environment Variables Documentation](https://github.com/TenDaysOfClojure/technical-assessment?tab=readme-ov-file#environment-variables-documentation) section for required
 environment variables for integration configuration.
 
 ```
@@ -71,7 +71,7 @@ clj -M -m technical-assessment.core
 To run unit tests, from a new terminal use the following command:
 
 ```
-clj -X:test
+clj -A:test
 ```
 
 ### Environment Variables Documentation
