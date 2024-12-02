@@ -8,7 +8,6 @@
    [technical-assessment.http-server.middleware :refer [wrap-exceptions]]
 
    ;; Intergation
-   [technical-assessment.integration.cloudinary :as integration.cloudinary]
    [technical-assessment.integration.facebook-auth :as integration.facebook-auth]
    [technical-assessment.database.core :as database]
 
@@ -21,7 +20,7 @@
    [technical-assessment.ux.pages.home :as home-page]
    [technical-assessment.ux.pages.general :as general-pages]
    [technical-assessment.ux.pages.user :as user-pages]
-   [taoensso.timbre :as logger]))
+   [technical-assessment.domain.user :as domain.user]))
 
 
 (defroutes app-routes
@@ -42,77 +41,14 @@
          (response/redirect auth-url)))
 
 
-  (GET urls/auth-facebook-call-back-route {{:keys[code state]} :params :as params}
+  (GET urls/auth-facebook-call-back-route {{:keys[code state]} :params}
+       ;; Note we use Facebook login API `state` param determine if it's a login or sign-up action.
+       ;; The `state` parameter is what facebook authentication uses to allow including extra data
+       ;; for authentication callbacks. In this case the `state` will be either `sign-up` or `login`.
 
-       ;; TODO This route now contains in situ soluton to the tech assessment
-       ;; the next step would be to refactor this into integration / domain code
+       (let [user-details (domain.user/login-or-sign-up-user-via-facebook code)
 
-       (logger/info "Received Facebook auth callback with state: " state)
-
-       (let [;; Note we use Facebook login API `state` param to pass the action to take
-             ;; `state` is the name of the parameter facebook uses to allow including extra data
-             ;; for authentication callbacks. `action-to-take` here can be `sign-up` or `login`.
-             action-to-take        state
-
-             facebook-user         (integration.facebook-auth/find-facebook-user
-                                    config/facebook-auth-config
-                                    code)
-
-             profile-pic-url       (get-in facebook-user [:picture :data :url])
-
-             facebook-user-id      (:id facebook-user)
-
-             base-user             (if-let [user (database/find-entity
-                                                  (config/current-database)
-                                                  :users
-                                                  {:user.auth.facebook/user-id facebook-user-id})]
-                                     ;; Existing entity in database
-                                     user
-
-                                     ;; New base user entity
-                                     {:entity/id (database/new-entity-id)
-                                      :user.auth.facebook/user-id facebook-user-id})
-
-             {cloudinary-secure-url
-              :secure-url
-
-              cloudinary-public-id
-              :public-id
-
-              cloudinary-version
-              :version
-
-              cloudinary-format
-              :format}              (integration.cloudinary/upload-image-using-image-url
-                                     config/default-cloudinary-config
-                                     profile-pic-url)
-
-             {:keys [first-name
-                     last-name
-                     email]}       facebook-user
-
-             user-details          (merge base-user
-                                          ;; This will always update the users details
-                                          ;; from facebook
-                                          {;; Profile details pulled from facebook
-                                           :user/first-name first-name
-                                           :user/last-name last-name
-                                           :user/full-name (str first-name " " last-name)
-                                           :user/email-address email
-                                           :user/profile-pic-url cloudinary-secure-url
-
-                                           ;; cloudinary integration details
-                                           :user.profile-pic.intergration.cloudinary/url cloudinary-secure-url
-                                           :user.profile-pic.intergration.cloudinary/public-id cloudinary-public-id
-                                           :user.profile-pic.intergration.cloudinary/version cloudinary-version
-                                           :user.profile-pic.intergration.cloudinary/format cloudinary-format})
-
-             ;; Always save the user with the latest details
-             saved?             (database/save-entity (config/current-database)
-                                                      :users
-                                                      user-details)
-
-             user-id            (:entity/id user-details)]
+             user-id      (:entity/id user-details)]
 
          (response/redirect (urls/user-dashboard-route user-id))))
 
@@ -132,6 +68,8 @@
                     (general-pages/not-found-page))))
 
 
+;; This represents the main web app routes and middleware and is used
+;; in conjunction with the Jetty server in `technical-assessment.http-server.server`.
 (def app
   (-> app-routes
       (wrap-defaults site-defaults)

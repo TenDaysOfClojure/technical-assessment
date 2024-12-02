@@ -39,6 +39,22 @@
        "/image/upload/" public-id))
 
 
+(defn secure-url [{:keys [secure-url]}]
+  secure-url)
+
+
+(defn public-id [{:keys [public-id]}]
+  public-id)
+
+
+(defn version [{:keys [version]}]
+  version)
+
+
+(defn file-format [{:keys [format]}]
+  format)
+
+
 (defn upload-image-using-image-url
   [cloudinary-config
    image-url
