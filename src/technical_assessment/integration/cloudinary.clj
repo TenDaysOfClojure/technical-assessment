@@ -1,42 +1,10 @@
 (ns technical-assessment.integration.cloudinary
   (:require [clj-http.client :as client]
-            [clojure.java.io :as io]
-            [taoensso.timbre :as logger]
-            [clojure.string :as string]
             [cheshire.core :as json]
             [clojure.pprint]
             [technical-assessment.config :as config]
-            [camel-snake-kebab.core :as casing]))
-
-
-(def auth-http-headers
-  {"Authorization"
-   (str "Basic " (config/cloudinary-authorisation-string
-                  config/default-cloudinary-config))})
-
-;; Add support for this in v2
-#_(defn upload-image-from-file
-    [cloudinary-config
-     file-path
-     ;; Optional / variable options which provide defaults
-     & {:keys [upload-preset]
-        ;; Check Upload Presets in Cloudinary dashboard for more options
-        :or {upload-preset "ml_default"} :as options}]
-    (let [url    (str "https://api.cloudinary.com/v1_1/"
-                      (:cloud-name cloudinary-config) "/image/upload")
-
-          params {:multipart [{:name "file" :content (io/file file-path)}
-                              {:name "upload_preset" :content upload-preset}]
-                  :headers auth-http-headers}]
-
-      ;; TODO standardise error handling
-      (client/post url params)))
-
-
-(defn public-image-url [cloudinary-config public-id]
-  (str "https://res.cloudinary.com/"
-       (:cloud-name cloudinary-config)
-       "/image/upload/" public-id))
+            [camel-snake-kebab.core :as casing]
+            [clojure.string :as string]))
 
 
 (defn secure-url [{:keys [secure-url]}]
@@ -59,34 +27,32 @@
   [cloudinary-config
    image-url
    ;; Optional / variable options which provide defaults
-   & {:keys [upload-preset]
+   & {:keys [public-id upload-preset tags]
       ;; Check Upload Presets in Cloudinary dashboard for more options
       :or {upload-preset "ml_default"} :as options}]
+
   (let [url        (str "https://api.cloudinary.com/v1_1/"
                         (:cloud-name cloudinary-config) "/image/upload")
 
-        params      {:multipart [{:name "file" :content image-url}
-                                 {:name "upload_preset" :content upload-preset}]
-                     :headers auth-http-headers}
+        api-params (cond-> [{:name "file" :content image-url}
+                            {:name "upload_preset" :content upload-preset}]
+
+                     ;; Optionally inlcude a `public-id` if provided
+                     ;; this will allow multiple uploads and overwrite
+                     ;; the image instead of creating new ones
+                     (not (nil? public-id))
+                     (conj {:name "public_id" :content public-id})
+
+                     (not (empty? tags))
+                     (conj {:name "tags" :content (string/join "," tags)}))
+
+        params      {:multipart api-params
+                     :headers {"Authorization"
+                               (str "Basic " (config/cloudinary-authorisation-string
+                                              cloudinary-config))}}
 
         response    (client/post url params)
 
         result-info (json/decode (:body response)
                                  casing/->kebab-case-keyword)]
     result-info))
-
-
-(defn fetch-image [cloudinary-config public-id]
-  ;; Note we fetch cloudinary data as a :stream
-  ;; to allow elegant handling of data
-  (client/get (public-image-url cloudinary-config public-id)
-              {:as :stream}))
-
-
-(defn fetch-image-and-save-to-local-file
-  [cloudinary-config public-id file-path-to-save]
-
-  (let [{:keys [body]} (fetch-image cloudinary-config public-id)]
-    ;; This saves the stream to a local file and is an elegant
-    ;; want of working with file data
-    (io/copy body (java.io.File. file-path-to-save))))
