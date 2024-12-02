@@ -17,19 +17,16 @@ clj -M:repl
 You can then connect to the local REPL with your preferred editor e.g. Emacs,
 VSCode, IntelliJ IDEA etc
 
+For CSS assests see the README in the `css` directory.
+
 ### Managing the HTTP server from the REPL
 
 A `dev/scratch.clj` file is provided with code that can start/stop
-the HTTP server.
+the HTTP server and perform general tasks.
 
 When connected to the REPL, open the file and evaluate the relevant code.
 
-To confirm if the server is up and running, open a new terminal and run the
-follwoing `curl` command:
-
-```
-curl -i http://localhost:3000
-```
+To confirm if the server is up and running, open a http://localhost:3000 in your browser.
 
 ### Non REPL HTTP server
 
@@ -42,7 +39,7 @@ Environment Variables.
 clj -M -m technical-assessment.core {}
 ```
 
-To start the HTTP server on the specific port (7777),  from a new terminal use the following command:
+To start the HTTP server on the specific port (7777), from a new terminal use the following command:
 
 ```
 clj -M -m technical-assessment.core http-port 7777
@@ -55,7 +52,6 @@ To run unit tests, from a new terminal use the following command:
 ```
 clj -X:test
 ```
-
 
 ### Environment Variables Documentation
 
