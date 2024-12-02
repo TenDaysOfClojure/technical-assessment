@@ -11,7 +11,7 @@
    [cheshire.core :as json]
    [technical-assessment.integration.cloudinary :as integration.cloudinary]
    [technical-assessment.integration.facebook-auth :as integration.facebook-auth]
-
+   [technical-assessment.database.core :as database]
 
    ;; General config
    [technical-assessment.config :as config]
@@ -44,34 +44,42 @@
          {:status 302 :headers {"Location" auth-url}}))
 
 
-  (GET urls/auth-facebook-call-back-route {{:keys[code state]} :params}
+  (GET urls/auth-facebook-call-back-route {{:keys[code state]} :params :as params}
        (let [;; Note we use Facebook login API `state` param to pass the action to take
              ;; `state` is the name of the parameter facebook uses to allow including extra data
              ;; for authentication callbacks. `action-to-take` here can be `sign-up` or `login`.
              action-to-take      state
 
-             user-data           (integration.facebook-auth/fetch-facebook-user-details code)
+             facebook-user       (integration.facebook-auth/find-facebook-user
+                                  config/facebook-auth-config
+                                  code)
 
-             profile-pic-url     (get-in user-data [:picture :data :url])
+             profile-pic-url     (get-in facebook-user [:picture :data :url])
+
+             facebook-user-id    (:id facebook-user)
 
              {:keys [public-id]} (integration.cloudinary/upload-image-using-image-url
                                   config/default-cloudinary-config
                                   profile-pic-url)
 
-             user-details        {:user-id (str (java.util.UUID/randomUUID))
-                                  :profile-pic.integration.cloudinary/public-id public-id
-                                  :profile-pic/url (integration.cloudinary/public-image-url public-id)}
+             user-details        {:entity/id (str (java.util.UUID/randomUUID))
+                                  :user.auth.facebook/user-id facebook-user-id
 
-             ;; TODO mock saving user to database
-             ]
+                                  :user/first-name (:first-name facebook-user)
+                                  :user/last-name (:last-name facebook-user)
+                                  :user/email-address (:email facebook-user)
 
-         (str action-to-take " user: "
-              user-data
-              "  "
+                                  :user.profile-pic.integration.cloudinary/public-id public-id
+                                  :user.profile-pic/url (integration.cloudinary/public-image-url
+                                                         config/default-cloudinary-config
+                                                         public-id)}
 
-              user-details
+             saved?             (database/save-entity (config/current-database)
+                                                      :users user-details) ]
 
-              )))
+         (clojure.pprint/pprint user-details)
+
+         (str saved? "" facebook-user " --" user-details)))
 
 
   ;; General 404 / page not found handler,

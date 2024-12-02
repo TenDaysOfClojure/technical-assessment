@@ -1,33 +1,30 @@
 (ns technical-assessment.integration.facebook-auth
-  (:require
-   ;; 3rd party intergation low level tools
-   [clj-http.client :as client]
-   [cheshire.core :as json]
-
-   ;; General config
-   [technical-assessment.config :as config]
-   [technical-assessment.urls :as urls]
-
-   [camel-snake-kebab.core :as casing]))
+  (:require [clj-http.client :as client]
+            [cheshire.core :as json]
+            [camel-snake-kebab.core :as casing]))
 
 
-(defn fetch-facebook-user-details [code]
-  (let [token-resp   (client/post
-                      "https://graph.facebook.com/v10.0/oauth/access_token"
-                      {:form-params {:client_id (:app-id config/facebook-auth-config)
-                                     :redirect_uri (:redirect-uri config/facebook-auth-config)
-                                     :client_secret (:client-secret config/facebook-auth-config)
-                                     :code code}})
+(defn find-facebook-user [facebook-auth-config code]
+  (let [token-resp        (client/post
+                           "https://graph.facebook.com/v10.0/oauth/access_token"
+                           {:form-params {:client_id (:app-id facebook-auth-config)
+                                          :redirect_uri (:redirect-uri facebook-auth-config)
+                                          :client_secret (:client-secret facebook-auth-config)
+                                          :code code}})
 
-        access-token (:access_token (json/parse-string (:body token-resp)
-                                                       casing/->kebab-case-keyword))
+        access-token      (:access-token (json/parse-string
+                                          (:body token-resp)
+                                          casing/->kebab-case-keyword))
 
-        user-resp    (client/get
-                      "https://graph.facebook.com/me"
-                      {:query-params {:access_token access-token
-                                      :fields "id,first_name,last_name,email,picture.width(2048).height(2048)"}})
+        fields-to-retried "id,first_name,last_name,email,picture.width(2048).height(2048)"
 
-        user-details     (json/parse-string (:body user-resp) )]
+        user-response     (client/get
+                           "https://graph.facebook.com/me"
+                           {:query-params {:access_token access-token
+                                           :fields fields-to-retried}})
+
+        user-details      (json/parse-string (:body user-response)
+                                             casing/->kebab-case-keyword)]
     user-details))
 
 

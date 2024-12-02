@@ -36,19 +36,22 @@
 
     [:div.space-y-4
 
-     [:p "If you don't have an account you can sign up now:"]
-
-     [:h2.text-xl "Sign up with Facebook" [:small " (this is your first time here)"]]
-     [:a.facebook-login-button.text-sm.w-64
-      {:href (urls/auth-facebook-route :sign-up)}
-      technical-assessment.ux.svg-library/facebook-icon
-      [:span.font-bold.pr-2.text-base"Sign up"] " with Facebook"]
-
-     [:p "If you have an account login to proceed:"]
-
-     [:h2.text-xl "Login with Facebook"]
+     [:div
+      [:h2.text-xl "Login"]
+      [:p "Already registerd? Login now to get access to your account."]]
 
      [:a.facebook-login-button.text-sm.bg-blue-700.w-64
       {:href (urls/auth-facebook-route :login)}
       technical-assessment.ux.svg-library/facebook-icon
-      [:span.font-bold.pr-2.text-base "Log in "] " with Facebook"]]]))
+      [:span.font-bold.pr-2.text-base "Log in "] " with Facebook"]
+
+     [:hr.horizontal-line]
+
+     [:div
+      [:h2.text-xl "Register"]
+      [:p "If you don't have an account you can sign up now to get access."]]
+
+     [:a.facebook-login-button.text-sm.w-64
+      {:href (urls/auth-facebook-route :sign-up)}
+      technical-assessment.ux.svg-library/facebook-icon
+      [:span.font-bold.pr-2.text-base"Sign up"] " with Facebook"]]]))
