@@ -12,3 +12,7 @@
 
 
 (def auth-facebook-call-back-route "/auth/facebook/callback")
+
+
+(defn user-dashboard-route [url-suffix]
+  (str "/user/dashboard/" url-suffix))

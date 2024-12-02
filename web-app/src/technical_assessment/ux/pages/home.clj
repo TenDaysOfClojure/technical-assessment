@@ -22,36 +22,36 @@
        [:li
         [:strong "Retrieve the facebook user details "]
         "(first name, last name, email, and profile picture), and "
-        [:strong "save to a database."]]
+        [:strong "save to a database"]]
 
        [:li
         "The " [:strong "profile picture should be retrieved from Facebook" ]
-        " and " [:strong "uploaded to Cloudinary,"]]
+        " and " [:strong "uploaded to Cloudinary"]]
 
        [:li
         "The" [:strong " Cloudinary URL of the profile picure" ]
-        " should be " [:strong "stored in the database." ]]]]]
+        " should be " [:strong "stored in the database" ]]]]]
 
     [:hr.horizontal-line]
 
     [:div.space-y-4
 
      [:div
-      [:h2.text-xl "Login"]
-      [:p "Already registerd? Login now to get access to your account."]]
+      [:h2.text-xl "Log in"]
+      [:p "Already registered? Log in now to get access to your account."]]
 
-     [:a.facebook-login-button.text-sm.bg-blue-700.w-64
+     [:a.facebook-login-button
       {:href (urls/auth-facebook-route :login)}
       technical-assessment.ux.svg-library/facebook-icon
-      [:span.font-bold.pr-2.text-base "Log in "] " with Facebook"]
+      [:span.font-bold.pr-1.text-base "Log in "] " with Facebook"]
 
      [:hr.horizontal-line]
 
      [:div
       [:h2.text-xl "Register"]
-      [:p "If you don't have an account you can sign up now to get access."]]
+      [:p "If you don't have an account yet you can sign up now to get access."]]
 
-     [:a.facebook-login-button.text-sm.w-64
+     [:a.facebook-login-button
       {:href (urls/auth-facebook-route :sign-up)}
       technical-assessment.ux.svg-library/facebook-icon
-      [:span.font-bold.pr-2.text-base"Sign up"] " with Facebook"]]]))
+      [:span.font-bold.pr-1.text-base"Sign up"] " with Facebook"]]]))
