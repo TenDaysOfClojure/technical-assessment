@@ -26,7 +26,6 @@
         user-details  (json/parse-string (:body user-response)
                                          casing/->kebab-case-keyword)]
 
-    (clojure.pprint/pprint user-details)
     user-details))
 
 
