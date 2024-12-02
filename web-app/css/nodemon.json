@@ -1,0 +1,8 @@
+{
+  "watch": ["tailwind.config.js",
+            "postcss.config.js",
+            "src/styles.css",
+            "./../src/technical_assessment/ux/*"],
+  "ext": "js,css,clj,cljs,edn",
+  "exec": "npm run build:css"
+}

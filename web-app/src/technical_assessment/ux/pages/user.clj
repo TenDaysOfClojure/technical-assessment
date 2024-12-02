@@ -5,6 +5,7 @@
             [technical-assessment.domain.user :as domain.user]
             [clojure.pprint]))
 
+
 (defn user-fields-table [user]
   ;; Sorts the fields by the key of the map
   (let [fields (sort-by key user)]
@@ -13,6 +14,7 @@
        [:tr.border.border-slate-200
         [:td.p-2.text-gray-700.font-semibold (str key)]
         [:td.p-2.text-gray-500 value]])]))
+
 
 (defn dashboard-page [user]
   (layouts/main-layout
