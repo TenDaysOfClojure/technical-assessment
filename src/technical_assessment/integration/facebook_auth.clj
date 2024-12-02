@@ -16,12 +16,12 @@
                                           (:body token-resp)
                                           casing/->kebab-case-keyword))
 
-        fields-to-retried "id,first_name,last_name,email,picture.width(2048).height(2048)"
+        fields            "id,first_name,last_name,email,picture.width(2048).height(2048)"
 
         user-response     (client/get
                            "https://graph.facebook.com/me"
                            {:query-params {:access_token access-token
-                                           :fields fields-to-retried}})
+                                           :fields fields}})
 
         user-details      (json/parse-string (:body user-response)
                                              casing/->kebab-case-keyword)]
