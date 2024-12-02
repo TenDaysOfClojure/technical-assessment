@@ -9,6 +9,8 @@
 (comment
 
   ;; Setup the web app's config
+  ;; This MUST be run before any other code that uses the config
+  ;; it's called in the main entry point of the app here `technical-assessment.core/-main`
   (config/setup-config!)
 
   ;; HTTP server management
