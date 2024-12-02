@@ -1,14 +1,16 @@
 {:paths ["src" "resources"]
- :deps {;; REPL tools for improved REPL development
+ :deps {org.clojure/clojure {:mvn/version "1.12.0"}
+
+       ;; REPL tools for improved REPL development
         nrepl/nrepl {:mvn/version "0.8.3"}
         refactor-nrepl/refactor-nrepl {:mvn/version "2.5.1"}
         cider/cider-nrepl {:mvn/version "0.25.9"}
 
         ;; HTTP Server key dependencies
-        ring/ring-core {:mvn/version "1.9.4"}
-        ring/ring-jetty-adapter {:mvn/version "1.9.4"}
-        ring/ring-defaults {:mvn/version "0.3.3"}
-        ring-logger-timbre/ring-logger-timbre {:mvn/version "0.7.5"}
+        ring/ring-core {:mvn/version "1.13.0"}
+        ring/ring-jetty-adapter {:mvn/version "1.13.0"}
+        ring/ring-defaults {:mvn/version "0.5.0"}
+        ring-logger-timbre/ring-logger-timbre {:mvn/version "0.7.6"}
 
         ;; Routing & HTML rendering
         compojure/compojure {:mvn/version "1.7.1"}
@@ -24,11 +26,31 @@
         ;; Casing translations for JSON/Clojure
         ;; Promots working with the correct data key casesing across
         ;; technologies and programming langauges
-        camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}}
+        camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}
 
- :aliases {:run {:main-opts ["-m" "technical-assessment.core"]}
+        ;; XTDB database
+
+        ;; xtdb-api for the main public API, for both remote-client and
+        ;; in-process nodes
+        com.xtdb/xtdb-api {:mvn/version "2.0.0-beta3"}
+
+        ;; xtdb-http-client-jvm for connecting to a remote server
+        com.xtdb/xtdb-http-client-jvm {:mvn/version "2.0.0-beta3"}
+
+        ;; xtdb-core for running an in-process (test) node (JDK 21+)
+        com.xtdb/xtdb-core {:mvn/version "2.0.0-beta3"}}
+
+ :aliases {:run {:main-opts ["-m" "technical-assessment.core"]
+                 ;; JVM options required for XTDB in-process node (dev/testing only)
+                 :jvm-opts ["--add-opens=java.base/java.nio=ALL-UNNAMED"
+                            "-Dio.netty.tryReflectionSetAccessible=true"]}
 
            :repl {:extra-paths ["dev"] ;; Include dev only source code
+
+                  ;; JVM options required for XTDB in-process node (dev/testing only)
+                  :jvm-opts ["--add-opens=java.base/java.nio=ALL-UNNAMED"
+                             "-Dio.netty.tryReflectionSetAccessible=true"]
+
                   ;; These options config the cider middleware for REPL development
                   :main-opts ["-m"
                               "nrepl.cmdline"
@@ -36,6 +58,10 @@
                               "[refactor-nrepl.middleware/wrap-refactor,cider.nrepl/cider-middleware]"]}
 
            :test {:extra-paths ["test"]
+                  ;; JVM options required for XTDB in-process node (dev/testing only)
+                  :jvm-opts ["--add-opens=java.base/java.nio=ALL-UNNAMED"
+                             "-Dio.netty.tryReflectionSetAccessible=true"]
+
                   :extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
                   :main-opts ["-m" "cognitect.test-runner"]
                   :exec-fn cognitect.test-runner.api/test}}}

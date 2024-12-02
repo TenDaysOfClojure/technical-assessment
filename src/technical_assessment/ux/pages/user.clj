@@ -15,32 +15,41 @@
 (defn dashboard-page [user]
   (layouts/main-layout
 
-   [:div.space-y-5
+   (if (not (nil? user))
 
-    [:div.text-center.space-y-3.md:flex.md:items-center.md:content-start.md:space-x-4
+     [:div.space-y-5
 
-     [:div.mx-auto.md:m-0
-      [:img.rounded-full.w-28.border.mx-auto
-       {:src (domain.user/profile-pic-url user)
-        :alt "Profile picture"}]]
+      [:div.text-center.space-y-3.md:flex.md:items-center.md:content-start.md:space-x-4
 
-     [:div.space-y-2.text-center
-      [:h1.text-3xl "👋 Welcome " (domain.user/full-name user) "!"]
+       [:div.mx-auto.md:m-0
+        [:img.rounded-full.w-28.border.mx-auto
+         {:src (domain.user/profile-pic-url user)
+          :alt "Profile picture"}]]
 
-      (when (domain.user/has-email-address? user)
-        (let [email-address (domain.user/email-address user)]
-          [:div.space-x-2.text-center
-           [:a.link {:href (str "mailto:" email-address)}
-            svg-library/email-icon  email-address]
+       [:div.space-y-2.text-center
+        [:h1.text-3xl "👋 Welcome " (domain.user/full-name user) "!"]
 
-           [:span " | "]
+        (when (domain.user/has-email-address? user)
+          (let [email-address (domain.user/email-address user)]
+            [:div.space-x-2.text-center
+             [:a.link {:href (str "mailto:" email-address)}
+              svg-library/email-icon  email-address]
 
-           [:a.link {:href urls/home-route} "Log out now"]]))]]
+             [:span " | "]
 
-    [:div.space-y-3.mx-auto.w-96.md:mx-0
-     [:h2.text-xl "Congratulations, you're now logged in!"]
-     [:p "As part of this technical assessment the following user data was persisted:"]
+             [:a.link {:href urls/home-route} "Log out now"]]))]]
 
-     [:div (pretty-database-entity user)]
+      [:div.space-y-3.mx-auto.w-96.md:mx-0
+       [:h2.text-xl "Congratulations, you're now logged in!"]
+       [:p "As part of this technical assessment the following user data was persisted:"]
 
-     [:div [:a.link {:href urls/home-route} "Log out now"]]]]))
+       [:div (pretty-database-entity user)]
+
+       [:div [:a.link {:href urls/home-route} "Log out now"]]]]
+
+     ;; No user provided
+     (layouts/main-layout
+      [:div.warning-alert
+       svg-library/info-icon
+
+       [:div "We cannot display the user dashboard as no user data was provided."]]))))

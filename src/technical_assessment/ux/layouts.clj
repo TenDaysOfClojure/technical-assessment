@@ -2,7 +2,7 @@
   (:require [technical-assessment.config :as config]))
 
 
-(defn main-layout [body]
+(defn main-layout [& body]
   [:html
    [:head
     [:meta {:charset "UTF-8"}]

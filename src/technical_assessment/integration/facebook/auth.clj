@@ -4,27 +4,25 @@
             [camel-snake-kebab.core :as casing]))
 
 
-(defn find-facebook-user [facebook-auth-config code]
-  (let [token-resp    (client/post
-                       "https://graph.facebook.com/v21.0/oauth/access_token"
-                       {:form-params {:client_id (:app-id facebook-auth-config)
-                                      :redirect_uri (:redirect-uri facebook-auth-config)
-                                      :client_secret (:client-secret facebook-auth-config)
-                                      :code code}})
+(defn get-facebook-user [facebook-auth-config code]
+  (let [token-response (client/post
+                        "https://graph.facebook.com/v21.0/oauth/access_token"
+                        {:form-params {:client_id (:app-id facebook-auth-config)
+                                       :redirect_uri (:redirect-uri facebook-auth-config)
+                                       :client_secret (:client-secret facebook-auth-config)
+                                       :code code}
+                         :as :json-kebab-keys})
 
-        access-token  (:access-token (json/parse-string
-                                      (:body token-resp)
-                                      casing/->kebab-case-keyword))
+        access-token   (:access-token (:body token-response))
 
-        fields        "id,first_name,last_name,email,picture.width(2048).height(2048)"
+        fields         "id,first_name,last_name,email,picture.width(2048).height(2048)"
 
-        user-response (client/get
-                       "https://graph.facebook.com/me"
-                       {:query-params {:access_token access-token
-                                       :fields fields}})
+        user-response  (client/get "https://graph.facebook.com/me"
+                                   {:query-params {:access_token access-token
+                                                   :fields fields}
+                                    :as :json-kebab-keys})
 
-        user-details  (json/parse-string (:body user-response)
-                                         casing/->kebab-case-keyword)]
+        user-details   (:body user-response)]
 
     user-details))
 
