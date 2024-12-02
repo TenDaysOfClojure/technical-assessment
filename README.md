@@ -36,7 +36,7 @@ To start the HTTP server on the default port (3000),  from a new terminal use th
 Environment Variables.
 
 ```
-clj -M -m technical-assessment.core {}
+clj -M -m technical-assessment.core
 ```
 
 To start the HTTP server on the specific port (7777), from a new terminal use the following command:

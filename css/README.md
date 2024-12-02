@@ -3,7 +3,7 @@
 Provides the main CSS assets used by the technical assessment web app found in the
 `web-app` directory.
 
-CSS assets are output to the `integration/web-app/resources/public/css` directory.
+CSS assets are output to the `/resources/public/css` directory.
 
 ## Setup
 

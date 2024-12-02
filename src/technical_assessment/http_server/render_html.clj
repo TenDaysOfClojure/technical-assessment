@@ -1,4 +1,4 @@
-(ns technical-assessment.render-html
+(ns technical-assessment.http-server.render-html
   (:require [hiccup2.core :as hiccup]))
 
 

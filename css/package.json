@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:css": "npx tailwindcss -i ./src/styles.css -o ./../web-app/resources/public/css/main.css --minify",
+    "build:css": "npx tailwindcss -i ./src/styles.css -o ./../resources/public/css/main.css --minify",
     "watch:css": "nodemon"
   },
   "keywords": [],

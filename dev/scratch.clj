@@ -1,5 +1,5 @@
 (ns scratch
-  (:require [technical-assessment.http-server :as http-server]
+  (:require [technical-assessment.http-server.server :as http-server]
             [technical-assessment.config :as config]
             [technical-assessment.database.core :as database]))
 
