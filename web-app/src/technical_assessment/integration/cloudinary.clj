@@ -13,21 +13,29 @@
    (str "Basic " (config/cloudinary-authorisation-string
                   config/default-cloudinary-config))})
 
-#_(defn upload-image [cloudinary-config
-                    image-path
-                    ;; Optional / variable options which provide defaults
-                    & {:keys [upload-preset]
-                       ;; Check Upload Presets in Cloudinary dashboard for more options
-                       :or {upload-preset "ml_default"} :as options}]
-  (let [url    (str "https://api.cloudinary.com/v1_1/"
-                    (:cloud-name cloudinary-config) "/image/upload")
+;; Add support for this in v2
+#_(defn upload-image-from-file
+    [cloudinary-config
+     file-path
+     ;; Optional / variable options which provide defaults
+     & {:keys [upload-preset]
+        ;; Check Upload Presets in Cloudinary dashboard for more options
+        :or {upload-preset "ml_default"} :as options}]
+    (let [url    (str "https://api.cloudinary.com/v1_1/"
+                      (:cloud-name cloudinary-config) "/image/upload")
 
-        params {:multipart [{:name "file" :content (io/file image-path)}
-                            {:name "upload_preset" :content upload-preset}]
-                :headers auth-http-headers}]
+          params {:multipart [{:name "file" :content (io/file file-path)}
+                              {:name "upload_preset" :content upload-preset}]
+                  :headers auth-http-headers}]
 
-    ;; TODO standardise error handling
-    (client/post url params)))
+      ;; TODO standardise error handling
+      (client/post url params)))
+
+
+(defn public-image-url [cloudinary-config public-id]
+  (str "https://res.cloudinary.com/"
+       (:cloud-name cloudinary-config)
+       "/image/upload/" public-id))
 
 
 (defn upload-image-using-image-url
@@ -46,9 +54,12 @@
 
         response    (client/post url params)
 
-        result-info (json/decode (:body response))]
+        result-info (json/decode (:body response))
 
-    {:public-id (get result-info "public_id")}))
+        public-id   (get result-info "public_id")]
+
+    {:public-id public-id
+     :public-url (public-image-url cloudinary-config public-id)}))
 
 
 (defn fetch-image [cloudinary-config public-id]
@@ -57,11 +68,11 @@
                  "/image/upload/" public-id)]
     ;; Note we fetch cloudinary data as a :stream
     ;; to allow elegant handling of data
-    ;;
-    (client/get url {:as :stream})))
+    (client/get (public-image-url cloudinary-config public-id)
+                {:as :stream})))
 
 
-(defn fetch-image-and-save-to-file
+(defn fetch-image-and-save-to-local-file
   [cloudinary-config public-id file-path-to-save]
 
    ;; TODO error handling
@@ -92,7 +103,7 @@
   ;; Fetch and save single file
   (let [public-id        "test-image_px6tzb" #_"cld-sample-4"
         file-path-to-save "/Users/ghostdog/Desktop/hello-world.jpg"]
-    (fetch-image-and-save-to-file default-cloudinary-config
+    (fetch-image-and-save-to-local-file default-cloudinary-config
                                   public-id
                                   "/Users/ghostdog/Desktop/hello-world.jpg"))
 

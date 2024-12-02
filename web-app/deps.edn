@@ -18,7 +18,12 @@
 
         ;; HTTP request client for 3rd party integration
         clj-http/clj-http {:mvn/version "3.12.3"}
-        cheshire/cheshire {:mvn/version "5.13.0"}}
+        cheshire/cheshire {:mvn/version "5.13.0"}
+
+        ;; Casing translations for JSON/Clojure
+        ;; Promots working with the correct data key casesing across
+        ;; technologies and programming langauges
+        camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}}
 
  :aliases {:run {:main-opts ["-m" "technical-assessment.core"]}
 
