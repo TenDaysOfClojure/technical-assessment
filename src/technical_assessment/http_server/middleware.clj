@@ -1,7 +1,7 @@
 (ns technical-assessment.http-server.middleware
   (:require [technical-assessment.http-server.render-html :as html]
             [technical-assessment.ux.pages.general :as general-pages]
-            [taoensso.timbre :as timbre-logger]
+            [taoensso.telemere :as logger]
             [ring.logger.protocols :refer [Logger]]))
 
 
@@ -12,9 +12,10 @@
       (handler request)
 
       (catch Exception exception
-        (timbre-logger/error "Unexpected HTTP server error occurred during request"
-                             {:uri (:uri request)}
-                             exception)
+        (logger/log! {:level :error
+                      :error exception
+                      :data {:uri (:uri request)}} 
+                     "Unexpected HTTP server error occurred during request")
 
         {:status 500
          :body (html/render
@@ -40,5 +41,6 @@
   (add-extra-middleware [_ handler] handler)
 
   (log [_ level throwable message]
-    (timbre-logger/log level throwable message)
-    (flush)))
+    ;; Only log non-debug messages to reduce noise
+    (when (not (= :debug level))
+      (logger/log! {:level level :error throwable} message))))

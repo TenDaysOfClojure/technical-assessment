@@ -3,8 +3,7 @@
 ;;
 ;; The underlying database technology is XTDB.
 (ns technical-assessment.database.core
-  (:require [taoensso.timbre :as logger]
-            [technical-assessment.database.xtdb :as database.xtdb]
+  (:require [technical-assessment.database.xtdb :as database.xtdb]
             [technical-assessment.database.core :as database]))
 
 
@@ -51,3 +50,7 @@
 
   ([db query query-params]
    (not (nil? (query-one db query query-params)))))
+
+
+(defn delete-entity-by-id [db entity-kind entity-id]
+  (database.xtdb/delete-by-id db entity-kind entity-id))
