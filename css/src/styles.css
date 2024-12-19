@@ -5,11 +5,11 @@
 @layer base {
 
   .main-body {
-    @apply p-3 md:px-20 md:py-8;
+    @apply p-3 md:px-20 md:py-8 bg-gradient-to-r from-blue-100 to-blue-300;
   }
 
   .horizontal-line {
-    @apply w-full mx-8 h-1 mx-auto my-4 bg-gray-100 border-0 rounded;
+    @apply w-full mx-8 h-px mx-auto my-4 bg-blue-50 border-0 rounded;
   }
 
   .link {

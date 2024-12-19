@@ -7,7 +7,7 @@
    [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
    [technical-assessment.http-server.middleware :as app-middleware]
    [ring.logger :as request-logger]
-   [taoensso.timbre :as logger]
+   [taoensso.telemere :as logger]
 
    ;; Intergation
    [technical-assessment.integration.facebook.auth :as integration.facebook-auth]
@@ -51,7 +51,7 @@
        ;; The `state` parameter is what facebook authentication uses to allow including extra data
        ;; for authentication callbacks. In this case the `state` will be either `sign-up` or `login`.
 
-       (logger/info "Facebook auth callback received for" state)
+       (logger/log! :debug ["Facebook auth callback received for" state])
 
        (let [user-details (domain.user/login-or-sign-up-user-via-facebook code)
 
@@ -65,12 +65,17 @@
                            (config/current-database)
                            :users user-id)]
 
+         (logger/log! :debug ["User dashboard page for user-id" user-id
+                              "> User found:" (not (nil? user-details))])
+
          (html/render (user-pages/dashboard-page user-details))))
 
 
-  ;; General 404 / page not found handler,
+
   ;; Note the 500 / unexpected error handler is implemented as middleware
   ;; in `technical-assessment.http-server.middleware/wrap-exceptions`.
+
+  ;; General 404 / page not found handler,
   (route/not-found (html/render
                     (general-pages/not-found-page))))
 
@@ -80,7 +85,7 @@
 (def app
   (-> app-routes
       (wrap-defaults site-defaults)
-      (request-logger/wrap-with-logger {:timing false
+      #_(request-logger/wrap-with-logger {:timing false
                                         :logger (app-middleware/->WebRequestLogger)
                                         :redact-keys app-middleware/logger-keys-to-redact})
       (app-middleware/wrap-exceptions)))

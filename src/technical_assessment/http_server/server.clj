@@ -1,5 +1,5 @@
 (ns technical-assessment.http-server.server
-  (:require [taoensso.timbre :as logger]
+  (:require [taoensso.telemere :as logger]
             [ring.adapter.jetty :as jetty]
             [technical-assessment.http-server.routes :as http-routes]))
 
@@ -20,7 +20,7 @@
 (defn start-server! [& {:keys [port] :as options}]
   (if (not (http-server-running? port))
     (do
-      (logger/info "Starting HTTP server with options" options)
+      (logger/log! :info ["Starting HTTP server with options" options])
 
       (let [server (jetty/run-jetty #'http-routes/app
                                     {:port (if (string? port) (Integer/parseInt port) port)
@@ -32,7 +32,7 @@
                                               :server server))))
 
     ;; HTTP server is already running, not starting.
-    (logger/warn "HTTP server already running with options" options)))
+    (logger/log! :warn ["HTTP server already running with options" options])))
 
 
 (defn stop-server! [port]
@@ -47,10 +47,10 @@
                                            (dissoc :server)
                                            (assoc :running? false)))
 
-        (logger/info "HTTP server stopped on port" port)))
+        (logger/log! :info ["HTTP server stopped on port" port])))
 
     ;; No server running, not stopping.
-    (logger/warn "No HTTP server running on port" port " to stop")))
+    (logger/log! :warn ["No HTTP server running on port" port " to stop"])))
 
 
 (defn restart-server! [port]
