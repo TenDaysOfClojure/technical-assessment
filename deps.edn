@@ -5,14 +5,13 @@
         ring/ring-core {:mvn/version "1.13.0"}
         ring/ring-jetty-adapter {:mvn/version "1.13.0"}
         ring/ring-defaults {:mvn/version "0.5.0"}
-        ring-logger-timbre/ring-logger-timbre {:mvn/version "0.7.6"}
 
         ;; Routing & HTML rendering
         compojure/compojure {:mvn/version "1.7.1"}
         hiccup/hiccup {:mvn/version "2.0.0-RC3"}
 
         ;; Logging
-        com.taoensso/timbre {:mvn/version "6.5.0"}
+        com.taoensso/telemere {:mvn/version "1.0.0-RC1"}
 
         ;; HTTP request client for 3rd party integration
         clj-http/clj-http {:mvn/version "3.12.3"}
@@ -50,9 +49,9 @@
                   :extra-deps {nrepl/nrepl {:mvn/version "0.8.3"}
                                refactor-nrepl/refactor-nrepl {:mvn/version "2.5.1"}
                                cider/cider-nrepl {:mvn/version "0.25.9"}}
+
                   ;; These options config the cider middleware for REPL development
-                  :main-opts ["-m"
-                              "nrepl.cmdline"
+                  :main-opts ["-m" "repl"
                               "--middleware"
                               "[refactor-nrepl.middleware/wrap-refactor,cider.nrepl/cider-middleware]"]}
 

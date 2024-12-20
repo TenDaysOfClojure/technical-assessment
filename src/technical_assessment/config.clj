@@ -1,6 +1,6 @@
 (ns technical-assessment.config
   (:require [clojure.string :as string]
-            [taoensso.timbre :as logger]
+            [taoensso.telemere :as logger]
             [clj-http.client :as http]
             [camel-snake-kebab.core :as key-transforms]
             [clojure.pprint]
@@ -27,27 +27,32 @@
 
 ;; -- Logger config --
 
-;; A minimal, spacious logger ideal for development
 (defn enable-minimal-logging! []
-  (let [safe-println (fn [& more]
-                       (.write *out* (str (string/join " " more) "\n"))
-                       (flush))]
-    (logger/set-config!
-     {:level :debug
-      :appenders {"minimal"
-                  {:enabled? true
-                   :async? false
-                   :min-level nil
-                   :fn
-                   (fn [{:keys [?err  level timestamp_ vargs]}]
-                     (safe-println (str @timestamp_ " "
-                                        (string/upper-case (name level)) ":")
-                                   (string/join " " vargs))
+  ;; A minimal, spacious logger ideal for development
+  (let [output (fn [{:keys [level msg_ error data]}]
+                 (str "[" (name level) "] "
 
-                     (if (not (nil? ?err))
-                       (clojure.pprint/pprint ?err))
+                      (str (force msg_) "\n")
 
-                     (safe-println "\n"))}}})))
+                      (when data
+                        (str "\nDATA: " (with-out-str
+                                          (clojure.pprint/pprint data))))
+
+                      (when error
+                        (str "\nERROR: " (.getMessage error) " "
+                             (apply str (interpose "\n" (.getStackTrace error)))
+                             "\n"))
+
+                      "\n"))]
+
+    ;; Remove minimim logging level for development
+    (logger/set-min-level! nil)
+
+    ;; Override the default console logging handler with our custom logging output
+    (logger/add-handler!
+     :default/console
+     (logger/handler:console {:output-fn output}))))
+
 
 ;; -- Environment helpers --
 
@@ -134,8 +139,13 @@
      (Exception. "Production database not yet implemented." {}))))
 
 
+;; -- Config setup --
+
 (defn setup-config! []
-  (enable-minimal-logging!)
+  (when (development-environment?)
+    (enable-minimal-logging!)
+
+    (logger/log! :info "Minimal logging enabled for development environment"))
 
   (check-facebook-auth-config!)
   (check-cloudinary-config!))

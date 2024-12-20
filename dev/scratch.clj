@@ -21,18 +21,16 @@
 
   (http-server/stop-all-servers!)
 
+  ;; Database scratch
 
-  ;; Database
-
-  (database/save-entity (config/current-database) :user
+  (database/save-entity (config/current-database) :users
                         {:entity/id "AB" :user/name "Alice" :user/age 30})
 
-  (database/find-entity-by-id (config/current-database) :user "AB")
-
-  (database/find-entity (config/current-database) :user {:user/name "Alice"})
+  (database/find-entity-by-id (config/current-database) :users "e1cae4a7-7cb2-4f2b-a16b-8f6c4ee254de")
 
   (database/find-all-entities (config/current-database) :user)
 
+  (database/delete-entity-by-id (config/current-database) :users "e1cae4a7-7cb2-4f2b-a16b-8f6c4ee254de")
 
   ;; Cloudinary
 
