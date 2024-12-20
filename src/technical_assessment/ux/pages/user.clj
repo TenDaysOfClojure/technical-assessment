@@ -2,17 +2,7 @@
   (:require [technical-assessment.ux.layouts :as layouts]
             [technical-assessment.urls :as urls]
             [technical-assessment.ux.svg-library :as svg-library]
-            [technical-assessment.domain.user :as domain.user]
-            [clojure.pprint]
-            [clojure.string :as string]))
-
-
-(defn pretty-database-entity [entity]
-  [:pre.text-xs.md:text-sm.font-mono.whitespace-pre-line
-   (string/replace (with-out-str
-                     (clojure.pprint/pprint entity))
-                   #"," "")])
-
+            [technical-assessment.domain.user :as domain.user]))
 
 (defn dashboard-page [user]
   (layouts/main-layout
@@ -39,15 +29,7 @@
 
              [:span " | "]
 
-             [:a.link {:href urls/home-route} "Log out now"]]))]]
-
-      #_[:div.space-y-3.mx-auto.w-fit.md:w-full
-       [:h2.text-xl "Congratulations, you're now logged in!"]
-       [:p "As part of this technical assessment the following user data was persisted:"]
-
-       [:div (pretty-database-entity user)]
-
-       [:div [:a.link {:href urls/home-route} "Log out now"]]]]
+             [:a.link {:href urls/home-route} "Log out now"]]))]]]
 
      ;; No user provided
      [:div.warning-alert

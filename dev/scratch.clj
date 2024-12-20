@@ -2,8 +2,7 @@
   (:require [technical-assessment.http-server.server :as http-server]
             [technical-assessment.config :as config]
             [technical-assessment.database.core :as database]
-            [technical-assessment.integration.cloudinary :as integration.cloudinary]
-            [taoensso.telemere :as logger]))
+            [technical-assessment.integration.cloudinary :as integration.cloudinary]))
 
 ;; This file contains common scratch code that is used during development
 
@@ -29,11 +28,9 @@
 
   (database/find-entity-by-id (config/current-database) :users "e1cae4a7-7cb2-4f2b-a16b-8f6c4ee254de")
 
-  (database/find-entity (config/current-database) :user {:user/name "Alice"})
-
   (database/find-all-entities (config/current-database) :user)
 
-  (database/delete-entity-by-id (config/current-database) :users "538727ce-1e66-456b-9cab-0c063e508d67")
+  (database/delete-entity-by-id (config/current-database) :users "e1cae4a7-7cb2-4f2b-a16b-8f6c4ee254de")
 
   ;; Cloudinary
 

@@ -2,7 +2,8 @@
   (:require [technical-assessment.http-server.render-html :as html]
             [technical-assessment.ux.pages.general :as general-pages]
             [taoensso.telemere :as logger]
-            [ring.logger.protocols :refer [Logger]]))
+            [technical-assessment.logging :as logging]
+            [clojure.string :as string]))
 
 
 (defn wrap-exceptions [handler]
@@ -22,25 +23,11 @@
                 (general-pages/unexpected-error-page))}))))
 
 
-(def logger-keys-to-redact #{:x-api-key
-                             :api-key
-                             :password
-                             :email-address
-                             :username
-                             :authorization
-                             :authorization-token
-                             :user-authorisation-token
-                             :code})
-
-
-;; Defines a custom request logger that creates spacious logging by putting a newline
-;; between logging outputs to make it slighlty more readable
-(defrecord WebRequestLogger []
-  Logger
-
-  (add-extra-middleware [_ handler] handler)
-
-  (log [_ level throwable message]
-    ;; Only log non-debug messages to reduce noise
-    (when (not (= :debug level))
-      (logger/log! {:level level :error throwable} message))))
+(defn request-logger [handler]
+  (fn [{:keys [request-method uri] :as request} ]
+    (let [{:keys [status] :as response} (handler request)]
+      (logging/info (logging/green-text "Web request")
+                    (string/upper-case (name request-method))
+                    uri
+                    (logging/cyan-text "status" status))
+      response)))

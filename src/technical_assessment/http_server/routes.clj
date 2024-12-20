@@ -6,7 +6,6 @@
    [ring.util.response :as response]
    [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
    [technical-assessment.http-server.middleware :as app-middleware]
-   [ring.logger :as request-logger]
    [taoensso.telemere :as logger]
 
    ;; Intergation
@@ -80,12 +79,11 @@
                     (general-pages/not-found-page))))
 
 
+
 ;; This represents the main web app routes and middleware and is used
 ;; in conjunction with the Jetty server in `technical-assessment.http-server.server`.
 (def app
   (-> app-routes
       (wrap-defaults site-defaults)
-      #_(request-logger/wrap-with-logger {:timing false
-                                        :logger (app-middleware/->WebRequestLogger)
-                                        :redact-keys app-middleware/logger-keys-to-redact})
-      (app-middleware/wrap-exceptions)))
+      (app-middleware/wrap-exceptions)
+      (app-middleware/request-logger)))
