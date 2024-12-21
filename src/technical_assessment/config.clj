@@ -1,10 +1,9 @@
 (ns technical-assessment.config
   (:require [clojure.string :as string]
-            [taoensso.telemere :as logger]
             [clj-http.client :as http]
             [camel-snake-kebab.core :as key-transforms]
-            [clojure.pprint]
-            [technical-assessment.database.xtdb :as database.xtdb])
+            [technical-assessment.database.xtdb :as database.xtdb]
+            [technical-assessment.logging :as logging])
 
   (:import java.util.Base64))
 
@@ -24,35 +23,6 @@
                      " config is missing config values."
                      " All values are expected to be provided.")
                 {:blank-config-keys blank-keys})))))
-
-;; -- Logger config --
-
-(defn enable-minimal-logging! []
-  ;; A minimal, spacious logger ideal for development
-  (let [output (fn [{:keys [level msg_ error data]}]
-                 (str "[" (name level) "] "
-
-                      (str (force msg_) "\n")
-
-                      (when data
-                        (str "\nDATA: " (with-out-str
-                                          (clojure.pprint/pprint data))))
-
-                      (when error
-                        (str "\nERROR: " (.getMessage error) " "
-                             (apply str (interpose "\n" (.getStackTrace error)))
-                             "\n"))
-
-                      "\n"))]
-
-    ;; Remove minimim logging level for development
-    (logger/set-min-level! nil)
-
-    ;; Override the default console logging handler with our custom logging output
-    (logger/add-handler!
-     :default/console
-     (logger/handler:console {:output-fn output}))))
-
 
 ;; -- Environment helpers --
 
@@ -143,9 +113,9 @@
 
 (defn setup-config! []
   (when (development-environment?)
-    (enable-minimal-logging!)
-
-    (logger/log! :info "Minimal logging enabled for development environment"))
+    (do
+      (logging/enable-ansi-console-colours!)
+      (logging/enable-minimal-logging!)))
 
   (check-facebook-auth-config!)
   (check-cloudinary-config!))

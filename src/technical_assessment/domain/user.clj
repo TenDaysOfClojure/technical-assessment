@@ -5,7 +5,7 @@
             [technical-assessment.database.core :as database]
             [technical-assessment.config :as config]
             [technical-assessment.integration.facebook.user :as integration.facebook-user]
-            [taoensso.telemere :as logger]))
+            [technical-assessment.logging :as logging]))
 
 
 ;; -- Start Field getters --
@@ -110,9 +110,9 @@
                            (user-details-for-login-or-sign-up facebook-user
                                                               cloudinary-result))]
 
-    (logger/log! :debug ["Login/signup from Facebook > existing user:"
-                         existing-user?
-                         "- saving user details to database" user-details])
+    (logging/debug "Login/signup from Facebook > existing user:"
+                   existing-user?
+                   "- saving user details to database" user-details)
 
     (save-user (config/current-database) user-details)
 
