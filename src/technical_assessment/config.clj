@@ -114,7 +114,7 @@
 (defn setup-config! []
   (when (development-environment?)
     (do
-      (logging/enable-ansi-console-colours!)
+      (logging/enable-ansi-terminal-colours!)
       (logging/enable-minimal-logging!)))
 
   (check-facebook-auth-config!)
