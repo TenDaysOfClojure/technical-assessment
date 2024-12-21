@@ -35,24 +35,39 @@
 
 
 ;; See https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
-(def green-terminal-colour 32)
-(def cyan-terminal-colour 36)
-(def red-terminal-colour 31)
-(def magenta-terminal-colour 35)
+
+(def grey-text 30)
+(def red-text 31)
+(def green-text 32)
+(def yellow-text 33)
+(def blue-text 34)
+(def magenta-text 35)
+(def cyan-text 36)
+(def white-text 37)
+
+
+(def grey-background 40)
+(def red-background 41)
+(def green-background 42)
+(def yellow-background 43)
+(def blue-background 44)
+(def magenta-background 45)
+(def cyan-background 46)
+(def white-background 47)
 
 
 (defn green-text [& text]
-  (highlight-text green-terminal-colour text))
+  (highlight-text green-text text))
 
 
 (defn cyan-text [& text]
-  (highlight-text cyan-terminal-colour text))
+  (highlight-text cyan-text text))
 
 
 (defn enable-minimal-logging! []
   ;; A minimal, spacious logger ideal for development
   (let [output (fn [{:keys [level msg_ error data]}]
-                 (let [message (str "[" (highlight-text magenta-terminal-colour
+                 (let [message (str "[" (highlight-text magenta-text
                                                         (name level)) "] "
 
                                     (str (force msg_) "\n")
@@ -73,7 +88,7 @@
                    (if (= :error level)
                      ;; Helpful in local development to highlight errors in red
                      ;; in the terminal
-                     (highlight-text red-terminal-colour message)
+                     (highlight-text red-text message)
                      message)))]
 
     ;; Remove minimim logging level for development
