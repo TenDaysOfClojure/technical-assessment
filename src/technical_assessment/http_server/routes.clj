@@ -64,6 +64,8 @@
                         (config/current-database)
                         :users user-id)]
 
+      (logging/info (logging/red-text "Hello world!!"))
+
       (logging/debug "User dashboard page for user-id" user-id
                      "> User found:" (not (nil? user-details)))
 
