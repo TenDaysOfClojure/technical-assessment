@@ -1,10 +1,9 @@
 (ns technical-assessment.config
   (:require [clojure.string :as string]
-            [taoensso.timbre :as logger]
             [clj-http.client :as http]
             [camel-snake-kebab.core :as key-transforms]
-            [clojure.pprint]
-            [technical-assessment.database.xtdb :as database.xtdb])
+            [technical-assessment.database.xtdb :as database.xtdb]
+            [technical-assessment.logging :as logging])
 
   (:import java.util.Base64))
 
@@ -24,30 +23,6 @@
                      " config is missing config values."
                      " All values are expected to be provided.")
                 {:blank-config-keys blank-keys})))))
-
-;; -- Logger config --
-
-;; A minimal, spacious logger ideal for development
-(defn enable-minimal-logging! []
-  (let [safe-println (fn [& more]
-                       (.write *out* (str (string/join " " more) "\n"))
-                       (flush))]
-    (logger/set-config!
-     {:level :debug
-      :appenders {"minimal"
-                  {:enabled? true
-                   :async? false
-                   :min-level nil
-                   :fn
-                   (fn [{:keys [?err  level timestamp_ vargs]}]
-                     (safe-println (str @timestamp_ " "
-                                        (string/upper-case (name level)) ":")
-                                   (string/join " " vargs))
-
-                     (if (not (nil? ?err))
-                       (clojure.pprint/pprint ?err))
-
-                     (safe-println "\n"))}}})))
 
 ;; -- Environment helpers --
 
@@ -134,8 +109,13 @@
      (Exception. "Production database not yet implemented." {}))))
 
 
+;; -- Config setup --
+
 (defn setup-config! []
-  (enable-minimal-logging!)
+  (when (development-environment?)
+    (do
+      (logging/enable-ansi-terminal-colours!)
+      (logging/enable-minimal-logging!)))
 
   (check-facebook-auth-config!)
   (check-cloudinary-config!))

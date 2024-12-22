@@ -5,7 +5,7 @@
             [technical-assessment.database.core :as database]
             [technical-assessment.config :as config]
             [technical-assessment.integration.facebook.user :as integration.facebook-user]
-            [taoensso.timbre :as logger]))
+            [technical-assessment.logging :as logging]))
 
 
 ;; -- Start Field getters --
@@ -34,29 +34,23 @@
 
 
 (defn user-details-for-login-or-sign-up [facebook-user cloudinary-result]
-  {;; Profile details pulled from facebook
-   :user/first-name (integration.facebook-user/first-name facebook-user)
+  (merge
+   #:user {;; Profile details pulled from facebook
+           :first-name (integration.facebook-user/first-name facebook-user)
 
-   :user/last-name (integration.facebook-user/last-name facebook-user)
+           :last-name (integration.facebook-user/last-name facebook-user)
 
-   :user/full-name (integration.facebook-user/full-name facebook-user)
+           :full-name (integration.facebook-user/full-name facebook-user)
 
-   :user/email-address (integration.facebook-user/email-address facebook-user)
+           :email-address (integration.facebook-user/email-address facebook-user)
 
-   :user/profile-pic-url (integration.cloudinary/secure-url cloudinary-result)
+           :profile-pic-url (integration.cloudinary/secure-url cloudinary-result)}
 
    ;; cloudinary integration details for reference
-   :user.profile-pic.integration.cloudinary/url
-   (integration.cloudinary/secure-url cloudinary-result)
-
-   :user.profile-pic.integration.cloudinary/public-id
-   (integration.cloudinary/public-id cloudinary-result)
-
-   :user.profile-pic.integration.cloudinary/version
-   (integration.cloudinary/version cloudinary-result)
-
-   :user.profile-pic.integration.cloudinary/format
-   (integration.cloudinary/file-format cloudinary-result)})
+   #:user.profile-pic.integration.cloudinary {:url (integration.cloudinary/secure-url cloudinary-result)
+                                              :public-id (integration.cloudinary/public-id cloudinary-result)
+                                              :version (integration.cloudinary/version cloudinary-result)
+                                              :format (integration.cloudinary/file-format cloudinary-result)}))
 
 
 (defn find-user-by-facebook-id [database facebook-user-id]
@@ -83,11 +77,15 @@
         facebook-user-id (integration.facebook-user/user-id
                           facebook-user)
 
-        base-user        (if-let [user (find-user-by-facebook-id
+        existing-user     (find-user-by-facebook-id
                                         (config/current-database)
-                                        facebook-user-id)]
+                                        facebook-user-id)
+
+        existing-user?    (not (nil? existing-user))
+
+        base-user        (if existing-user?
                            ;; Existing entity in database
-                           user
+                           existing-user
 
                            ;; New base user entity
                            {:entity/id (database/new-entity-id)
@@ -98,6 +96,8 @@
         cloudinary-result (integration.cloudinary/upload-image-using-image-url
                            config/default-cloudinary-config
                            profile-pic-url
+                           ;; By providing a `public-id` we can prevent
+                           ;; duplicate uploads of the same profile image
                            :public-id (:entity/id base-user)
                            :tags ["user profile picture"])
 
@@ -110,8 +110,11 @@
                            (user-details-for-login-or-sign-up facebook-user
                                                               cloudinary-result))]
 
-    (logger/debug "Saving user details to database" user-details)
+    (logging/debug "Login/signup from Facebook > existing user:"
+                   existing-user?
+                   "- saving user details to database" user-details)
 
     (save-user (config/current-database) user-details)
 
     user-details))
+

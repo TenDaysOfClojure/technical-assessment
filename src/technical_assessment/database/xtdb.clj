@@ -96,7 +96,6 @@
 
 
 (defn query [node query query-params]
-  (prn query query-params)
   (map ->domain-entity
        (xt/q node query query-params)))
 
@@ -105,3 +104,9 @@
   (-> (xt/q node query query-params)
       (first)
       (->domain-entity)))
+
+
+(defn delete-by-id [node entity-kind entity-id]
+  (xt/submit-tx node
+    [[:delete {:from entity-kind :bind '[{:xt/id $entity-id}]}
+      {:entity-id entity-id}]]))
