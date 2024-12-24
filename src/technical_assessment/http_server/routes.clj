@@ -15,6 +15,7 @@
    ;; General config
    [technical-assessment.config :as config]
    [technical-assessment.urls :as urls]
+   [technical-assessment.ux.logging :as ux-logging]
 
    ;; Sever side rendering, layouts and content etc
    [technical-assessment.http-server.render-html :as html]
@@ -50,7 +51,8 @@
     ;; The `state` parameter is what facebook authentication uses to allow including extra data
     ;; for authentication callbacks. In this case the `state` will be either `sign-up` or `login`.
 
-    (logging/debug ["Facebook auth callback received for" state])
+       (logging/debug (ux-logging/->message
+                       "Facebook auth callback received for" (logging/backtick state) "action"))
 
     (let [user-details (domain.user/login-or-sign-up-user-via-facebook code)
 
@@ -64,10 +66,9 @@
                         (config/current-database)
                         :users user-id)]
 
-      (logging/info (logging/red-text "Hello world!!"))
-
-      (logging/debug "User dashboard page for user-id" user-id
-                     "> User found:" (not (nil? user-details)))
+      (logging/debug (ux-logging/->message
+                      "User dashboard page for user-id" user-id
+                      "> User found:" (not (nil? user-details))))
 
       (html/render (user-pages/dashboard-page user-details))))
 

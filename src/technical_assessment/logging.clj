@@ -139,13 +139,16 @@
                      (red-text message)
                      message)))]
 
-    ;; Remove minimim logging level for development
-    (logger/set-min-level! nil)
-
     ;; Override the default console/terminal logging handler with our custom logging output
     (logger/add-handler!
      :default/console
      (logger/handler:console {:output-fn output}))))
+
+
+(defn enable-development-logging! []
+    ;; Remove minimim logging level for development
+  (logger/set-min-level! nil)
+  (enable-minimal-logging!))
 
 
 (defn ->log-message [& text]
@@ -167,3 +170,15 @@
 (defn error [& {:keys [exception data message]}]
   (logger/log! {:level :error :error exception :data data}
                (->log-message message)))
+
+
+(defn backtick [text]
+  (str "`" text "`"))
+
+
+(defn readable-data [data]
+  (str "\n\n"
+       "```\n\n"
+       (with-out-str
+         (clojure.pprint/pprint data))
+       "````"))

@@ -112,7 +112,8 @@
 
     (logging/debug "Login/signup from Facebook > existing user:"
                    existing-user?
-                   "- saving user details to database" user-details)
+                   "- saving user details to database:"
+                   (logging/readable-data user-details))
 
     (save-user (config/current-database) user-details)
 

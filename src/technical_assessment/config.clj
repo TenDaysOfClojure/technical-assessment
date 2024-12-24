@@ -115,7 +115,7 @@
   (when (development-environment?)
     (do
       (logging/enable-ansi-terminal-colours!)
-      (logging/enable-minimal-logging!)))
+      (logging/enable-development-logging!)))
 
   (check-facebook-auth-config!)
   (check-cloudinary-config!))
